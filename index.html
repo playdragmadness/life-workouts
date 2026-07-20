@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Progression — Workout Console</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
 <style>
   :root{
     --bg:#14171B; --panel:#1C2127; --panel2:#232A31; --line:#2E363F;
@@ -284,10 +285,11 @@
 (function(){
   "use strict";
 
-  // ============ CONFIG — paste your two Supabase values here ============
-  const SUPABASE_URL = "YOUR_PROJECT_URL";        // e.g. https://abcd1234.supabase.co
-  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";      // the "anon public" key (safe to expose — RLS protects data)
-  // =====================================================================
+  // ============ CONFIG — your keys live in config.js (edit that once) ============
+  var CFG = window.APP_CONFIG || {};
+  const SUPABASE_URL = CFG.SUPABASE_URL || "YOUR_PROJECT_URL";
+  const SUPABASE_ANON_KEY = CFG.SUPABASE_ANON_KEY || "YOUR_ANON_KEY";
+  // ==============================================================================
 
   const $ = function(id){return document.getElementById(id);};
   function showSetupNotice(msg){
