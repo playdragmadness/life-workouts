@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Progression — Workout Console</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#14171B; --panel:#1C2127; --panel2:#232A31; --line:#2E363F;
+    --ink:#E7EBEF; --dim:#8E9BA8; --faint:#5C6874;
+    --go:#46D18A; --hold:#F2B43C; --leg:#5FA8FF; --danger:#E06A5A;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(120% 60% at 50% -10%, #1b2027 0%, var(--bg) 55%) fixed, var(--bg);
+    color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; padding:0 0 64px; line-height:1.45}
+  .wrap{max-width:640px; margin:0 auto; padding:0 18px}
+
+  .topbar{display:flex; align-items:center; gap:12px; padding:16px 0 14px; border-bottom:1px solid var(--line); margin-bottom:20px; position:relative}
+  .burger{background:transparent; border:1px solid var(--line); border-radius:9px; width:42px; height:38px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; flex-shrink:0}
+  .burger span{display:block; width:18px; height:2px; background:var(--ink); border-radius:2px}
+  .brand{display:flex; align-items:baseline; gap:9px}
+  .brand h1{font-size:20px; margin:0; letter-spacing:-.02em; font-weight:800}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--go); box-shadow:0 0 10px var(--go); align-self:center}
+  .ptitle{margin-left:auto; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+
+  .drawer{display:none; position:absolute; top:100%; left:0; right:0; z-index:40;
+    background:var(--panel2); border:1px solid var(--line); border-radius:12px; margin-top:6px; overflow:hidden}
+  .drawer.open{display:block}
+  .drawer button{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:transparent;
+    border:none; border-bottom:1px solid var(--line); color:var(--ink); padding:14px 16px; font-size:15px; cursor:pointer; border-radius:0}
+  .drawer button:last-child{border-bottom:none}
+  .drawer button:hover{background:var(--panel)}
+  .drawer button.active{color:var(--go)}
+  .drawer .ic{font-family:var(--mono); font-size:13px; color:var(--faint); width:18px; text-align:center}
+
+  .counts{display:flex; gap:20px; font-family:var(--mono); font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.08em; margin-bottom:18px}
+  .counts b{color:var(--ink); font-size:15px; display:block; letter-spacing:0}
+
+  .filterbar{margin-bottom:16px}
+  .filterbar select, .picker select{width:100%; background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    border-radius:10px; padding:11px; font-family:var(--sans); font-size:14px}
+  .filterbar select:focus, .picker select:focus{outline:none; border-color:var(--go)}
+  .picker{margin-bottom:16px}
+
+  .goalbar{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+  .goalbar label{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--faint)}
+  .goalbar select{flex:1; background:#12151A; border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:9px 10px; font-family:var(--sans); font-size:14px}
+  .goalbar select:focus{outline:none; border-color:var(--go)}
+  .ghostmini{background:transparent; border:1px solid var(--line); color:var(--dim); border-radius:9px; padding:9px 12px; font-size:12px; cursor:pointer; white-space:nowrap}
+  .ghostmini:hover{color:var(--ink); border-color:#3a444f}
+
+  .authwrap{min-height:70vh; display:flex; align-items:center; justify-content:center}
+  .authcard{width:100%; max-width:360px; background:linear-gradient(180deg,var(--panel2),var(--panel)); border:1px solid var(--line); border-radius:16px; padding:28px 24px}
+  .authcard .brand{justify-content:center; margin-bottom:6px}
+  .authcard .sub{text-align:center; color:var(--dim); font-size:13px; margin-bottom:22px}
+  .authcard label{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); margin:14px 0 6px}
+  .authcard input{width:100%; background:#12151A; border:1px solid var(--line); color:var(--ink); border-radius:10px; padding:12px; font-size:15px}
+  .authcard input:focus{outline:none; border-color:var(--go)}
+  .authbtns{display:flex; gap:10px; margin-top:20px}
+  .authbtns button{flex:1; padding:12px; border-radius:10px; font-weight:600; cursor:pointer; border:none; font-size:14px}
+  .primary{background:var(--go); color:#0c1712}
+  .ghost{background:transparent; color:var(--ink); border:1px solid var(--line)!important}
+
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel)); border:1px solid var(--line); border-radius:14px; padding:16px 16px 14px; margin-bottom:14px; position:relative}
+  .card.lvl{border-color:rgba(70,209,138,.5)}
+  .chead{display:flex; align-items:flex-start; justify-content:space-between; gap:12px}
+  .name{font-weight:700; font-size:17px; letter-spacing:-.01em}
+  .tags{margin-top:6px}
+  .cat{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; padding:3px 7px; border-radius:5px; display:inline-block; border:1px solid var(--line); color:var(--dim)}
+  .cat.compound{color:var(--ink); border-color:#3a444f}
+  .cat.leg{color:var(--leg); border-color:rgba(95,168,255,.35)}
+  .cat.mach{color:var(--dim); border-color:#3a444f; margin-left:6px; text-transform:none; letter-spacing:.02em}
+
+  .readout{text-align:right; flex-shrink:0}
+  .rolabel{font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+  .weight{font-family:var(--mono); font-size:30px; font-weight:600; line-height:1; letter-spacing:-.02em}
+  .weight .u{font-size:13px; color:var(--dim); margin-left:3px; font-weight:400}
+  .weight input{width:74px; background:transparent; border:none; color:var(--ink); font:inherit; text-align:right; border-bottom:1px dashed var(--line)}
+  .weight input:focus{outline:none; border-bottom-color:var(--go)}
+
+  .aim{margin:12px 0 4px; font-size:13px; color:var(--dim)}
+  .aim b{color:var(--ink); font-family:var(--mono); font-weight:600}
+  .range{color:var(--faint); font-family:var(--mono); font-size:12px}
+
+  .sets{margin:12px 0 0}
+  .setrow{display:flex; align-items:center; gap:8px; margin-top:8px}
+  .setrow .sn{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); width:38px; flex-shrink:0}
+  .setrow input{background:#12151A; border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:10px 8px; font-family:var(--mono); font-size:16px; text-align:center; font-weight:600}
+  .setrow input:focus{outline:none; border-color:var(--go)}
+  .setrow .win{width:78px}
+  .setrow .rin{width:60px}
+  .setrow .unit{font-family:var(--mono); font-size:11px; color:var(--dim)}
+  .setrow .x{font-family:var(--mono); font-size:12px; color:var(--faint); margin:0 2px}
+
+  .noterow{margin-top:10px}
+  .noterow input{width:100%; background:#12151A; border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:9px 10px; font-size:13px; font-family:var(--sans)}
+  .noterow input:focus{outline:none; border-color:var(--go)}
+
+  .row{display:flex; gap:10px; margin-top:11px; align-items:center}
+  button{font-family:var(--sans); cursor:pointer; border:none; border-radius:9px; font-weight:600; font-size:14px}
+  .save{background:var(--ink); color:#12151A; padding:11px 16px; flex:1}
+  .save:active{transform:translateY(1px)}
+  .del{background:transparent; color:var(--faint); border:1px solid var(--line); padding:11px 13px; font-size:13px}
+  .del:hover{color:var(--danger); border-color:rgba(224,106,90,.4)}
+
+  .rec{margin-top:12px; padding:11px 13px; border-radius:10px; font-size:13.5px; display:flex; gap:10px; align-items:center; line-height:1.35}
+  .rec.go{background:rgba(70,209,138,.1); border:1px solid rgba(70,209,138,.3)}
+  .rec.hold{background:rgba(242,180,60,.09); border:1px solid rgba(242,180,60,.28)}
+  .rec.miss{background:rgba(224,106,90,.09); border:1px solid rgba(224,106,90,.28)}
+  .rec .pill{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:4px 8px; border-radius:6px; white-space:nowrap; flex-shrink:0}
+  .rec.go .pill{background:var(--go); color:#0c1712}
+  .rec.hold .pill{background:var(--hold); color:#1c1405}
+  .rec.miss .pill{background:var(--danger); color:#1c0f0d}
+  .rec span{color:var(--ink)}
+  .rec b{font-family:var(--mono)}
+  .coach{margin-top:9px; padding:10px 12px; border-radius:10px; font-size:13px; line-height:1.4;
+    background:rgba(95,168,255,.09); border:1px solid rgba(95,168,255,.3); color:var(--ink)}
+  .coach .cp{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--leg); display:block; margin-bottom:3px}
+
+  .adder{background:var(--panel); border:1px dashed var(--line); border-radius:14px; padding:16px; margin-top:22px}
+  .adder h3{margin:0 0 13px; font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); font-family:var(--mono); font-weight:600}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .field label{display:block; font-size:11px; color:var(--faint); margin-bottom:5px; font-family:var(--mono); text-transform:uppercase; letter-spacing:.06em}
+  .field input,.field select{width:100%; background:#12151A; border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:10px; font-family:var(--sans); font-size:14px}
+  .field input:focus,.field select:focus{outline:none; border-color:var(--go)}
+  .field.full{grid-column:1/-1}
+  .addbtn{background:var(--go); color:#0c1712; width:100%; padding:12px; margin-top:12px}
+  .recnote{color:var(--dim); font-size:12px; font-family:var(--mono); line-height:1.5; margin-top:12px}
+
+  .mrow{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+  .mname{flex:1; background:#12151A; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:9px 10px; font-size:14px; font-family:var(--sans)}
+  .mname:focus{outline:none; border-color:var(--go)}
+  .mcount{font-family:var(--mono); font-size:11px; color:var(--faint); white-space:nowrap}
+  .mdel{background:transparent; border:1px solid var(--line); color:var(--faint); border-radius:8px; padding:8px 11px; font-size:13px; cursor:pointer}
+  .mdel:hover{color:var(--danger); border-color:rgba(224,106,90,.4)}
+  .mnote{color:var(--faint); font-size:13px; font-family:var(--mono); padding:2px 0 10px}
+
+  /* history */
+  .hrow{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px}
+  .hrow .htop{display:flex; justify-content:space-between; align-items:baseline; gap:10px}
+  .hrow .hname{font-weight:700; font-size:15px}
+  .hrow .hdate{font-family:var(--mono); font-size:11px; color:var(--faint); white-space:nowrap}
+  .hrow .hsets{font-family:var(--mono); font-size:13px; color:var(--dim); margin-top:6px}
+  .hrow .hnote{font-size:12px; color:var(--faint); margin-top:6px; font-style:italic}
+  .badge{font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:3px 7px; border-radius:5px}
+  .badge.go{background:rgba(70,209,138,.16); color:var(--go)}
+  .badge.hold{background:rgba(242,180,60,.16); color:var(--hold)}
+  .badge.miss{background:rgba(224,106,90,.16); color:var(--danger)}
+
+  /* viz */
+  .chartcard{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px}
+  .chartcard .cstats{display:flex; gap:22px; margin-bottom:12px; font-family:var(--mono); font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.06em}
+  .chartcard .cstats b{color:var(--ink); font-size:16px; display:block; letter-spacing:0}
+  .cdates{display:flex; justify-content:space-between; font-family:var(--mono); font-size:10px; color:var(--faint); margin-top:4px}
+  .legend{display:flex; gap:14px; margin-top:12px; font-family:var(--mono); font-size:11px; color:var(--dim)}
+  .legend i{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px}
+
+  /* settings */
+  .sect{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px}
+  .sect h3{margin:0 0 12px; font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--dim); font-family:var(--mono); font-weight:600}
+  .toggle{display:flex; align-items:center; justify-content:space-between; gap:12px}
+  .toggle .tl{font-size:14px}
+  .toggle input{width:20px; height:20px; accent-color:var(--go)}
+  .stext{color:var(--faint); font-size:12px; line-height:1.55; margin-top:10px}
+  .stext code{font-family:var(--mono); color:var(--dim)}
+  .srow{display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:14px}
+  .srow .sv{font-family:var(--mono); font-size:13px; color:var(--dim)}
+  .btnline{background:transparent; border:1px solid var(--line); color:var(--ink); border-radius:9px; padding:10px 14px; font-size:13px; cursor:pointer}
+  .btnline:hover{border-color:#3a444f}
+
+  .hint{color:var(--faint); font-size:12px; margin-top:26px; line-height:1.6; border-top:1px solid var(--line); padding-top:16px}
+  .toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:#0e1114; border:1px solid var(--line); color:var(--ink); padding:12px 16px; border-radius:10px; font-size:13px; max-width:90%; opacity:0; pointer-events:none; transition:opacity .25s; z-index:60}
+  .toast.show{opacity:1}
+  .toast.err{border-color:rgba(224,106,90,.5); color:#f2b0a6}
+  .loading{text-align:center; color:var(--faint); font-family:var(--mono); font-size:12px; padding:40px 0}
+</style>
+</head>
+<body>
+
+<!-- ===== AUTH ===== -->
+<div class="wrap authwrap" id="authView" style="display:none">
+  <div class="authcard">
+    <div class="brand"><span class="dot"></span><h1>Progression</h1></div>
+    <div class="sub">Sign in to your training console</div>
+    <label>Email</label><input id="aEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    <label>Password</label><input id="aPass" type="password" autocomplete="current-password" placeholder="password">
+    <div class="authbtns"><button class="primary" id="btnSignIn">Sign in</button><button class="ghost" id="btnSignUp">Create account</button></div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="wrap" id="appView" style="display:none">
+  <div class="topbar">
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="brand"><span class="dot"></span><h1>Progression</h1></div>
+    <div class="ptitle" id="ptitle">Console</div>
+    <div class="drawer" id="drawer">
+      <button data-panel="Console"><span class="ic">=</span> Console</button>
+      <button data-panel="History"><span class="ic">H</span> History log</button>
+      <button data-panel="Visualize"><span class="ic">~</span> Data visualizer</button>
+      <button data-panel="Settings"><span class="ic">*</span> Settings</button>
+    </div>
+  </div>
+
+  <!-- Console -->
+  <div id="panelConsole">
+    <div class="counts">
+      <div>Exercises<b id="cExercises">0</b></div>
+      <div>Leveled up<b id="cLeveled">0</b></div>
+      <div>Holding<b id="cHold">0</b></div>
+    </div>
+    <div class="filterbar"><select id="filter"><option value="">All exercises</option></select></div>
+    <div id="list"><div class="loading">Loading your console...</div></div>
+    <div class="adder">
+      <h3>Add exercise</h3>
+      <div class="grid">
+        <div class="field full"><label>Name</label><input id="fName" placeholder="e.g. Tricep pushdown"></div>
+        <div class="field full"><label>Machine</label><select id="fMachine"><option value="">-- none (free weight) --</option></select></div>
+        <div class="field"><label>Category</label><select id="fCat"><option value="compound">Compound</option><option value="isolation">Isolation</option><option value="leg">Leg</option></select></div>
+        <div class="field"><label>Weight (lb)</label><input id="fWeight" type="number" inputmode="numeric" placeholder="0"></div>
+        <div class="field"><label>Rep range low</label><input id="fLow" type="number" inputmode="numeric" placeholder="8"></div>
+        <div class="field"><label>Rep range high</label><input id="fHigh" type="number" inputmode="numeric" placeholder="12"></div>
+        <div class="field full"><label>Weight increment (lb)</label><input id="fInc" type="number" inputmode="decimal" placeholder="5"></div>
+      </div>
+      <div id="recNote" class="recnote"></div>
+      <button class="addbtn" id="addBtn">Add to console</button>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div id="panelHistory" style="display:none">
+    <div class="filterbar"><select id="histFilter"><option value="">All exercises</option></select></div>
+    <div id="historyList"><div class="loading">Loading history...</div></div>
+  </div>
+
+  <!-- Visualize -->
+  <div id="panelViz" style="display:none">
+    <div class="picker"><select id="vizPick"></select></div>
+    <div id="vizArea"><div class="loading">Pick an exercise to see its trend.</div></div>
+  </div>
+
+  <!-- Settings -->
+  <div id="panelSettings" style="display:none">
+    <div class="sect">
+      <h3>Training goal</h3>
+      <div class="goalbar">
+        <label>Goal</label>
+        <select id="goalSel"><option value="strength">Strength</option><option value="balanced">Balanced</option><option value="size">Size</option></select>
+        <button id="applyAll" class="ghostmini">Apply to all</button>
+      </div>
+      <div class="stext">Sets the recommended rep range for new exercises. "Apply to all" resets every exercise to the current goal's ranges.</div>
+    </div>
+
+    <div class="sect">
+      <h3>AI coach (DeepSeek)</h3>
+      <div class="toggle"><span class="tl">Enable AI coach</span><input type="checkbox" id="aiToggle"></div>
+      <div class="stext">When on, saving a session <b>with a note</b> asks the coach to sanity-check the recommendation (and it can ease the load for pain/injury notes). Requires the <code>deepseek</code> edge function deployed with your key — see SETUP.md.</div>
+      <div style="margin-top:12px"><button class="btnline" id="testCoach">Test coach connection</button></div>
+    </div>
+
+    <div class="sect">
+      <h3>Machines</h3>
+      <div id="machineList"></div>
+      <div class="grid"><div class="field full"><label>Machine name</label><input id="mName" placeholder="e.g. Cable station"></div></div>
+      <button class="addbtn" id="addMachineBtn">Add machine</button>
+    </div>
+
+    <div class="sect">
+      <h3>Account</h3>
+      <div class="srow"><span>Signed in as</span><span class="sv" id="who"></span></div>
+      <div style="margin-top:12px"><button class="btnline" id="btnSignOut">Sign out</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ============ CONFIG — paste your two Supabase values here ============
+  const SUPABASE_URL = "YOUR_PROJECT_URL";        // e.g. https://abcd1234.supabase.co
+  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";      // the "anon public" key (safe to expose — RLS protects data)
+  // =====================================================================
+
+  const $ = function(id){return document.getElementById(id);};
+  function showSetupNotice(msg){
+    document.body.innerHTML =
+      '<div class="wrap" style="max-width:430px;padding-top:64px"><div class="authcard">'
+      +'<div class="brand" style="justify-content:center"><span class="dot"></span><h1>Progression</h1></div>'
+      +'<div class="sub">'+(msg||"Add your Supabase keys to connect")+'</div>'
+      +'<p style="color:var(--dim);font-size:13px;line-height:1.65">Open <code style="font-family:var(--mono);color:var(--ink)">index.html</code>, paste your <b>Project URL</b> and <b>anon key</b> into the CONFIG block near the top of the script, then reload.</p>'
+      +'</div></div>';
+  }
+  if(!window.supabase){ showSetupNotice("Couldn't load the Supabase library - check your connection and reload."); return; }
+  var configured = /^https:\/\/\S+/.test(SUPABASE_URL) && SUPABASE_ANON_KEY.indexOf("YOUR_")!==0 && SUPABASE_ANON_KEY.length>10;
+  var sb=null;
+  if(configured){ try{ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }catch(e){ sb=null; } }
+  if(!sb){ showSetupNotice(); return; }
+
+  var state=[], machines=[], session=null, goal="balanced", aiEnabled=false;
+
+  const authView=$("authView"), appView=$("appView"), list=$("list");
+  function toast(msg,isErr){ var t=$("toast"); t.textContent=msg; t.className="toast show"+(isErr?" err":""); clearTimeout(t._t); t._t=setTimeout(function(){t.className="toast";},3400); }
+  function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+  function mid(lo,hi){return Math.round((lo+hi)/2);}
+  function normSet(v){ if(v==null) return {w:null,r:null}; if(typeof v==="number") return {w:null,r:v}; return {w:(v.w==null?null:Number(v.w)), r:(v.r==null?null:Number(v.r))}; }
+  function fmtSets(sets){ return (sets||[]).map(function(s){var n=normSet(s); return (n.r!=null)?((n.w!=null?n.w:"?")+"x"+n.r):null;}).filter(Boolean).join(", "); }
+  function fmtDate(iso){ try{var d=new Date(iso); return (d.getMonth()+1)+"/"+d.getDate()+" "+d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}catch(e){return "";} }
+
+  const GOAL_RANGES={ strength:{compound:[4,6],isolation:[6,8],leg:[6,8]}, balanced:{compound:[6,10],isolation:[10,15],leg:[10,15]}, size:{compound:[8,12],isolation:[12,20],leg:[12,20]} };
+  const GOAL_LABEL={strength:"Strength",balanced:"Balanced",size:"Size"};
+  const GOAL_WHY={strength:"heavier loads, lower reps",balanced:"a mix of strength and size",size:"moderate loads, higher reps"};
+  const DEF_INC={compound:5,isolation:5,leg:5};
+
+  // ---------- progression engine (pure) ----------
+  function computeNext(ex, sets){
+    var W=Number(ex.weight), inc=Number(ex.inc), lo=ex.lo, hi=ex.hi;
+    var perf=sets.filter(function(s){return s&&s.r!=null&&!isNaN(s.r);}).map(function(s){return {w:(s.w!=null&&!isNaN(s.w))?Number(s.w):W, r:Number(s.r)};});
+    if(perf.length===0) return null;
+    var minW=Math.min.apply(null,perf.map(function(s){return s.w;})), minR=Math.min.apply(null,perf.map(function(s){return s.r;}));
+    if(perf.length===3 && minW>=W && minR>=hi){ var to=Math.round((minW+inc)*100)/100; return {weight:to,target:mid(lo,hi),last:sets,rec:{type:"go",from:W,to:to,target:mid(lo,hi)}}; }
+    if(minW>=W && minR>=lo){ return {weight:minW,target:hi,last:sets,rec:{type:"hold",weight:minW,target:hi,beat:minR}}; }
+    var successW=null; perf.forEach(function(s){ if(s.r>=lo) successW=(successW==null)?s.w:Math.max(successW,s.w); });
+    var to2=(successW!=null)?successW:Math.max(0,Math.round((minW-inc)*100)/100);
+    return {weight:to2,target:lo,last:sets,rec:{type:"miss",from:W,to:to2,target:lo,eased:(to2<W)}};
+  }
+
+  // ---------- seed ----------
+  const SEED_MACHINES=["Chest press","Row","Lat pulldown","Shoulder press","Pec fly / Rear delt","Tricep press","Bicep curl","Ab crunch","Leg press","Leg curl","Leg extension","Calf raise","Back extension"];
+  const SEED=[
+    ["Bench press (bar)","compound",80,6,10,5,null],["Row (machine)","compound",130,6,10,5,"Row"],
+    ["Chest press","compound",85,8,12,5,"Chest press"],["Shoulder press","compound",0,8,12,5,"Shoulder press"],
+    ["Pulldown","compound",0,8,12,5,"Lat pulldown"],["Tricep press","isolation",140,10,15,5,"Tricep press"],
+    ["Bicep curl (machine)","isolation",80,10,15,5,"Bicep curl"],["Bicep curl (seated DB)","isolation",20,10,15,2.5,null],
+    ["Pec fly","isolation",100,10,15,5,"Pec fly / Rear delt"],["Rear deltoid","isolation",100,12,15,5,"Pec fly / Rear delt"],
+    ["45 straight-arm raise","isolation",12,12,15,2.5,null],["Ab crunch machine","isolation",125,10,15,5,"Ab crunch"],
+    ["Leg press","leg",0,8,12,10,"Leg press"],["Seated leg curl","leg",0,10,15,5,"Leg curl"],
+    ["Leg extension","leg",0,10,15,5,"Leg extension"],["Single-leg step down","leg",0,8,12,2.5,null],
+    ["Calf raise","leg",0,12,15,5,"Calf raise"],["Back extension machine","leg",0,10,15,5,"Back extension"]
+  ];
+
+  // ---------- data layer ----------
+  async function loadData(){
+    list.innerHTML='<div class="loading">Loading your console...</div>';
+    var res=await Promise.all([ sb.from("machines").select("*").order("sort").order("created_at"), sb.from("exercises").select("*").order("sort").order("created_at") ]);
+    if(res[1].error){ list.innerHTML='<div class="loading">Could not load data.</div>'; toast(res[1].error.message,true); return; }
+    machines=res[0].data||[];
+    if(!res[1].data.length){ await seed(); return; }
+    state=res[1].data; render();
+  }
+  async function seed(){
+    if(!machines.length){
+      var r=await sb.from("machines").insert(SEED_MACHINES.map(function(m,i){return {name:m,sort:i};})).select();
+      if(r.error){ toast("Couldn't create machines: "+r.error.message,true); return; }
+      machines=r.data;
+    }
+    var byName={}; machines.forEach(function(m){byName[m.name]=m.id;});
+    var rows=SEED.map(function(e,i){ return {name:e[0],cat:e[1],weight:e[2],lo:e[3],hi:e[4],inc:e[5],target:e[2]>0?mid(e[3],e[4]):e[3],last:[null,null,null],rec:null,sort:i,machine_id:e[6]?byName[e[6]]:null}; });
+    var ins=await sb.from("exercises").insert(rows);
+    if(ins.error){ toast("Couldn't set up exercises: "+ins.error.message,true); return; }
+    await loadData();
+  }
+  async function saveSession(ex, sets, note){
+    var prescribed=Number(ex.weight), aim=ex.target;
+    var upd=computeNext(ex,sets);
+    if(!upd){ toast("Enter your reps first."); return; }
+    var u=await sb.from("exercises").update(upd).eq("id",ex.id);
+    if(u.error){ toast(u.error.message,true); return; }
+    Object.assign(ex,upd);
+    var s=await sb.from("sessions").insert({exercise_id:ex.id, exercise_name:ex.name, cat:ex.cat, sets:sets, prescribed_weight:prescribed, target:aim, result:upd.rec.type, next_weight:upd.weight, note:(note&&note.trim())?note.trim():null});
+    if(s.error) console.warn("session log:", s.error.message);
+    render();
+    if(aiEnabled && note && note.trim()) coachOnSession(ex, sets, upd, note.trim(), prescribed);
+  }
+  async function setWeight(ex,w){
+    var upd={weight:w}; if(ex.rec==null) upd.target=w>0?mid(ex.lo,ex.hi):ex.lo;
+    var r=await sb.from("exercises").update(upd).eq("id",ex.id);
+    if(r.error){ toast(r.error.message,true); return; } Object.assign(ex,upd); render();
+  }
+  async function addExercise(obj){ var r=await sb.from("exercises").insert(obj); if(r.error){ toast(r.error.message,true); return; } await loadData(); }
+  async function delExercise(ex){ var r=await sb.from("exercises").delete().eq("id",ex.id); if(r.error){ toast(r.error.message,true); return; } state=state.filter(function(x){return x.id!==ex.id;}); render(); }
+  async function addMachine(name){ var sort=machines.length?Math.max.apply(null,machines.map(function(m){return m.sort||0;}))+1:0; var r=await sb.from("machines").insert({name:name,sort:sort}); if(r.error){ toast(r.error.message,true); return; } await loadData(); }
+  async function renameMachine(m,name){ var r=await sb.from("machines").update({name:name}).eq("id",m.id); if(r.error){ toast(r.error.message,true); return; } m.name=name; render(); }
+  async function delMachine(m){ var r=await sb.from("machines").delete().eq("id",m.id); if(r.error){ toast(r.error.message,true); return; } await loadData(); }
+
+  // ---------- AI coach ----------
+  async function askCoach(payload){
+    var g=await sb.auth.getSession(); var s=g.data.session; if(!s) throw new Error("no session");
+    var res=await fetch(SUPABASE_URL+"/functions/v1/deepseek",{ method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token}, body:JSON.stringify(payload) });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    return await res.json();
+  }
+  async function coachOnSession(ex, sets, upd, note, prescribed){
+    try{
+      var advice=await askCoach({ mode:"session", goal:GOAL_LABEL[goal],
+        exercise:{name:ex.name, category:ex.cat, range:[ex.lo,ex.hi]},
+        prescribed_weight:prescribed, sets:sets,
+        recommendation:{result:upd.rec.type, next_weight:upd.weight, aim:upd.target}, note:note });
+      if(!advice || !advice.message) return;
+      var newRec=Object.assign({}, ex.rec, {coach:advice.message, coachWeight:(advice.adjust&&typeof advice.weight==="number")?advice.weight:null});
+      var patch={rec:newRec};
+      if(advice.adjust && typeof advice.weight==="number" && advice.weight>0){ patch.weight=advice.weight; }
+      var r=await sb.from("exercises").update(patch).eq("id",ex.id);
+      if(!r.error){ Object.assign(ex,patch); ex.rec=newRec; render(); }
+    }catch(e){ toast("Coach unavailable - check AI setup in Settings.", true); }
+  }
+
+  // ---------- console render ----------
+  function fillMachineControls(){
+    var sel=$("fMachine"), cur=sel.value; sel.innerHTML='<option value="">-- none (free weight) --</option>';
+    machines.forEach(function(m){ var o=el("option",null,m.name); o.value=m.id; sel.appendChild(o); }); sel.value=cur;
+    [ ["filter","All exercises"], ["histFilter","All exercises"] ].forEach(function(cfg){
+      var f=$(cfg[0]), fc=f.value; f.innerHTML='<option value="">'+cfg[1]+'</option>';
+      machines.forEach(function(m){ var o=el("option",null,m.name); o.value=m.id; f.appendChild(o); });
+      var fo=el("option",null,"Free weight (no machine)"); fo.value="__none__"; f.appendChild(fo); f.value=fc;
+    });
+    var vp=$("vizPick"), vc=vp.value; vp.innerHTML="";
+    state.forEach(function(ex){ var o=el("option",null,ex.name); o.value=ex.id; vp.appendChild(o); });
+    if(vc) vp.value=vc;
+  }
+  function renderMachines(){
+    var box=$("machineList"); box.innerHTML="";
+    if(!machines.length){ box.appendChild(el("div","mnote","No machines yet - add one below.")); return; }
+    machines.forEach(function(m){
+      var count=state.filter(function(x){return x.machine_id===m.id;}).length;
+      var rowEl=el("div","mrow"); var nm=el("input","mname"); nm.value=m.name;
+      nm.addEventListener("change",function(){ var v=nm.value.trim(); if(v) renameMachine(m,v); });
+      rowEl.appendChild(nm); rowEl.appendChild(el("span","mcount",count+" ex"));
+      var d=el("button","mdel","Delete"); d.addEventListener("click",function(){ delMachine(m); }); rowEl.appendChild(d); box.appendChild(rowEl);
+    });
+  }
+  function render(){
+    fillMachineControls(); renderMachines();
+    var mById={}; machines.forEach(function(m){mById[m.id]=m.name;});
+    var filter=$("filter").value;
+    var shown=state.filter(function(ex){ if(!filter) return true; if(filter==="__none__") return !ex.machine_id; return ex.machine_id===filter; });
+    list.innerHTML=""; var leveled=0, holding=0;
+    state.forEach(function(ex){ if(ex.rec&&ex.rec.type==="go")leveled++; if(ex.rec&&ex.rec.type==="hold")holding++; });
+    if(!shown.length){ list.appendChild(el("div","loading","Nothing here for that filter.")); }
+    shown.forEach(function(ex){
+      var card=el("div","card"+(ex.rec&&ex.rec.type==="go"?" lvl":""));
+      var head=el("div","chead"); var left=el("div");
+      left.appendChild(el("div","name",ex.name));
+      var tags=el("div","tags"); tags.appendChild(el("span","cat "+ex.cat,ex.cat));
+      if(ex.machine_id&&mById[ex.machine_id]) tags.appendChild(el("span","cat mach",mById[ex.machine_id]));
+      left.appendChild(tags); head.appendChild(left);
+      var ro=el("div","readout"); ro.appendChild(el("div","rolabel","Prescribed"));
+      var wt=el("div","weight"); var wi=el("input"); wi.type="number"; wi.inputMode="numeric"; wi.value=ex.weight||"";
+      wi.addEventListener("change",function(){ var v=parseFloat(wi.value); setWeight(ex,isNaN(v)?0:v); });
+      wt.appendChild(wi); wt.appendChild(el("span","u","lb")); ro.appendChild(wt); head.appendChild(ro); card.appendChild(head);
+      var aim=el("div","aim");
+      if(ex.weight>0) aim.innerHTML='Goal: <b>'+ex.weight+'</b> lb x <b>'+ex.target+'</b> reps <span class="range">- range '+ex.lo+'-'+ex.hi+'</span>';
+      else aim.innerHTML='<span class="range">Set a starting weight to begin - range '+ex.lo+'-'+ex.hi+'</span>';
+      card.appendChild(aim);
+      var sets=el("div","sets"); var rows2=[]; var lastArr=ex.last||[];
+      for(var i=0;i<3;i++){
+        var sset=normSet(lastArr[i]); var sr=el("div","setrow"); sr.appendChild(el("span","sn","Set "+(i+1)));
+        var win=el("input","win"); win.type="number"; win.inputMode="decimal"; win.value=(sset.w!=null)?sset.w:(ex.weight||"");
+        var rin=el("input","rin"); rin.type="number"; rin.inputMode="numeric"; rin.value=(sset.r!=null)?sset.r:""; rin.placeholder=String(ex.target||"");
+        sr.appendChild(win); sr.appendChild(el("span","unit","lb")); sr.appendChild(el("span","x","x")); sr.appendChild(rin); sr.appendChild(el("span","unit","reps"));
+        sets.appendChild(sr); rows2.push({win:win,rin:rin});
+      }
+      card.appendChild(sets);
+      var nw=el("div","noterow"); var ni=el("input"); ni.type="text"; ni.placeholder="Add a note (optional)"; nw.appendChild(ni); card.appendChild(nw);
+      var row=el("div","row"); var sv=el("button","save","Save session");
+      sv.addEventListener("click",function(){ saveSession(ex, rows2.map(function(rw){ var w=parseFloat(rw.win.value), r=parseInt(rw.rin.value,10); return {w:isNaN(w)?null:w, r:isNaN(r)?null:r}; }), ni.value); ni.value=""; });
+      var dl=el("button","del","Delete"); dl.addEventListener("click",function(){ delExercise(ex); });
+      row.appendChild(sv); row.appendChild(dl); card.appendChild(row);
+      if(ex.rec){
+        var type=ex.rec.type; var rec=el("div","rec "+(type==="go"?"go":(type==="miss"?"miss":"hold")));
+        if(type==="go") rec.innerHTML='<span class="pill">Add weight</span><span>Leveled up: <b>'+ex.rec.from+' -> '+ex.rec.to+' lb</b>. Next session aim <b>'+ex.rec.target+'</b> reps.</span>';
+        else if(type==="hold") rec.innerHTML='<span class="pill">Add reps</span><span>Hold <b>'+ex.rec.weight+' lb</b>. Push toward <b>'+ex.rec.target+'</b> reps - beat last time\'s <b>'+ex.rec.beat+'</b>.</span>';
+        else rec.innerHTML = ex.rec.eased ? '<span class="pill">Eased</span><span>Missed the target - eased <b>'+ex.rec.from+' -> '+ex.rec.to+' lb</b> so next time is achievable. Aim <b>'+ex.rec.target+'</b> reps.</span>' : '<span class="pill">Rebuild</span><span>Didn\'t sustain all sets - holding <b>'+ex.rec.to+' lb</b>. Aim <b>'+ex.rec.target+'</b> reps to lock in the range.</span>';
+        card.appendChild(rec);
+        if(ex.rec.coach){ var cch=el("div","coach"); cch.innerHTML='<span class="cp">AI coach</span>'+ex.rec.coach; card.appendChild(cch); }
+      }
+      list.appendChild(card);
+    });
+    $("cExercises").textContent=state.length; $("cLeveled").textContent=leveled; $("cHold").textContent=holding;
+  }
+
+  // ---------- history ----------
+  async function loadHistory(){
+    var box=$("historyList"); box.innerHTML='<div class="loading">Loading history...</div>';
+    var f=$("histFilter").value; var q=sb.from("sessions").select("*").order("performed_at",{ascending:false}).limit(200);
+    if(f && f!=="__none__"){ var ids=state.filter(function(x){return x.machine_id===f;}).map(function(x){return x.id;}); q=q.in("exercise_id", ids.length?ids:["00000000-0000-0000-0000-000000000000"]); }
+    var r=await q; if(r.error){ box.innerHTML='<div class="loading">Could not load history.</div>'; toast(r.error.message,true); return; }
+    if(!r.data.length){ box.innerHTML='<div class="loading">No sessions logged yet. Log a workout on the Console.</div>'; return; }
+    box.innerHTML="";
+    r.data.forEach(function(row){
+      var hr=el("div","hrow"); var top=el("div","htop");
+      top.appendChild(el("span","hname",row.exercise_name||"(deleted)"));
+      var rt=el("div"); rt.style.display="flex"; rt.style.gap="8px"; rt.style.alignItems="center";
+      if(row.result) rt.appendChild(el("span","badge "+row.result, row.result==="go"?"Level up":(row.result==="miss"?"Eased":"Hold")));
+      rt.appendChild(el("span","hdate",fmtDate(row.performed_at))); top.appendChild(rt); hr.appendChild(top);
+      hr.appendChild(el("div","hsets", fmtSets(row.sets)+(row.next_weight!=null?("   ->  next "+row.next_weight+" lb"):"")));
+      if(row.note) hr.appendChild(el("div","hnote", '"'+row.note+'"'));
+      box.appendChild(hr);
+    });
+  }
+
+  // ---------- visualize ----------
+  function drawChart(container, rows){
+    if(!rows.length){ container.innerHTML='<div class="loading">No sessions logged for this exercise yet.</div>'; return; }
+    var pts=rows.map(function(row){ var ws=(row.sets||[]).map(function(s){var n=normSet(s);return n.w!=null?n.w:(row.prescribed_weight||0);}); var top=ws.length?Math.max.apply(null,ws):(row.prescribed_weight||0); return {w:top, result:row.result, when:row.performed_at}; });
+    var W=600,H=250,pad=40; var ws=pts.map(function(p){return p.w;}); var minY=Math.min.apply(null,ws), maxY=Math.max.apply(null,ws);
+    if(minY===maxY){ minY=Math.max(0,minY-5); maxY=maxY+5; }
+    var n=pts.length; var X=function(i){ return pad + (n===1?(W-2*pad)/2:(i*(W-2*pad)/(n-1))); }; var Y=function(v){ return H-pad-((v-minY)/(maxY-minY))*(H-2*pad); };
+    var col={go:"#46D18A",hold:"#F2B43C",miss:"#E06A5A"};
+    var poly=pts.map(function(p,i){return X(i)+","+Y(p.w);}).join(" ");
+    var dots=pts.map(function(p,i){return '<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(p.w).toFixed(1)+'" r="4" fill="'+(col[p.result]||"#8E9BA8")+'"/>';}).join("");
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet">'
+      +'<line x1="'+pad+'" y1="'+(H-pad)+'" x2="'+(W-pad)+'" y2="'+(H-pad)+'" stroke="#2E363F"/>'
+      +'<line x1="'+pad+'" y1="'+pad+'" x2="'+pad+'" y2="'+(H-pad)+'" stroke="#2E363F"/>'
+      +'<text x="'+(pad-8)+'" y="'+(Y(maxY)+4)+'" fill="#5C6874" font-size="12" text-anchor="end" font-family="monospace">'+maxY+'</text>'
+      +'<text x="'+(pad-8)+'" y="'+(Y(minY)+4)+'" fill="#5C6874" font-size="12" text-anchor="end" font-family="monospace">'+minY+'</text>'
+      +(n>1?'<polyline points="'+poly+'" fill="none" stroke="#5FA8FF" stroke-width="2"/>':'')+dots+'</svg>';
+    var cur=pts[pts.length-1].w, best=Math.max.apply(null,ws);
+    container.innerHTML='<div class="chartcard"><div class="cstats"><div>Current<b>'+cur+' lb</b></div><div>Best<b>'+best+' lb</b></div><div>Sessions<b>'+n+'</b></div></div>'
+      +svg+'<div class="cdates"><span>'+fmtDate(pts[0].when)+'</span><span>'+fmtDate(pts[pts.length-1].when)+'</span></div>'
+      +'<div class="legend"><span><i style="background:#46D18A"></i>Level up</span><span><i style="background:#F2B43C"></i>Hold</span><span><i style="background:#E06A5A"></i>Eased</span></div></div>';
+  }
+  async function loadViz(){
+    var exId=$("vizPick").value; var area=$("vizArea");
+    if(!exId){ area.innerHTML='<div class="loading">Add an exercise first.</div>'; return; }
+    area.innerHTML='<div class="loading">Loading trend...</div>';
+    var r=await sb.from("sessions").select("*").eq("exercise_id",exId).order("performed_at",{ascending:true}).limit(500);
+    if(r.error){ area.innerHTML='<div class="loading">Could not load.</div>'; toast(r.error.message,true); return; }
+    drawChart(area, r.data);
+  }
+
+  // ---------- settings helpers ----------
+  function fillAddDefaults(){
+    var cat=$("fCat").value; var r=GOAL_RANGES[goal][cat]||GOAL_RANGES[goal].isolation;
+    $("fLow").value=r[0]; $("fHigh").value=r[1]; $("fInc").value=DEF_INC[cat];
+    $("recNote").textContent="Recommended for "+GOAL_LABEL[goal]+" - "+cat+": "+r[0]+"-"+r[1]+" reps ("+GOAL_WHY[goal]+"). Override anytime.";
+  }
+  async function setGoal(g){ goal=g; fillAddDefaults(); var r=await sb.auth.updateUser({data:{goal:g}}); if(r.error){ toast(r.error.message,true); return; } toast("Goal set to "+GOAL_LABEL[g]+"."); }
+  var applyArmed=false;
+  async function applyRecommendedToAll(){
+    var ups=state.map(function(ex){ var r=GOAL_RANGES[goal][ex.cat]||GOAL_RANGES[goal].isolation; return sb.from("exercises").update({lo:r[0],hi:r[1],target:mid(r[0],r[1])}).eq("id",ex.id); });
+    var results=await Promise.all(ups); var bad=results.filter(function(r){return r.error;}); if(bad.length){ toast(bad[0].error.message,true); return; }
+    await loadData(); toast("All ranges reset to the "+GOAL_LABEL[goal]+" recommendation.");
+  }
+  async function setAi(on){ aiEnabled=on; var r=await sb.auth.updateUser({data:{aiCoach:on}}); if(r.error){ toast(r.error.message,true); aiEnabled=!on; $("aiToggle").checked=!on; return; } toast(on?"AI coach on. Add a note when saving to use it.":"AI coach off."); }
+
+  // ---------- navigation ----------
+  var PANELS={Console:"panelConsole",History:"panelHistory",Visualize:"panelViz",Settings:"panelSettings"};
+  function showPanel(name){
+    Object.keys(PANELS).forEach(function(k){ $(PANELS[k]).style.display = (k===name)?"block":"none"; });
+    $("ptitle").textContent=name; $("drawer").classList.remove("open");
+    Array.prototype.forEach.call($("drawer").children,function(b){ b.classList.toggle("active", b.getAttribute("data-panel")===name); });
+    if(name==="History") loadHistory();
+    if(name==="Visualize") loadViz();
+  }
+  $("burger").addEventListener("click",function(e){ e.stopPropagation(); $("drawer").classList.toggle("open"); });
+  document.addEventListener("click",function(e){ if(!$("drawer").contains(e.target) && e.target!==$("burger") && !$("burger").contains(e.target)) $("drawer").classList.remove("open"); });
+  Array.prototype.forEach.call($("drawer").children,function(b){ b.addEventListener("click",function(){ showPanel(b.getAttribute("data-panel")); }); });
+  $("histFilter").addEventListener("change",loadHistory);
+  $("vizPick").addEventListener("change",loadViz);
+  $("filter").addEventListener("change",render);
+
+  // ---------- auth ----------
+  async function signIn(){ var e=$("aEmail").value.trim(),p=$("aPass").value; if(!e||!p){toast("Enter your email and password.");return;} var r=await sb.auth.signInWithPassword({email:e,password:p}); if(r.error) toast(r.error.message,true); }
+  async function signUp(){ var e=$("aEmail").value.trim(),p=$("aPass").value; if(!e||!p){toast("Enter an email and password.");return;} var r=await sb.auth.signUp({email:e,password:p}); if(r.error){toast(r.error.message,true);return;} if(!r.data.session) toast("Account created - check your email to confirm, then sign in."); }
+  async function signOut(){ await sb.auth.signOut(); state=[]; machines=[]; }
+  $("btnSignIn").addEventListener("click",signIn); $("btnSignUp").addEventListener("click",signUp); $("btnSignOut").addEventListener("click",signOut);
+  $("aPass").addEventListener("keydown",function(e){ if(e.key==="Enter") signIn(); });
+
+  // ---------- settings wiring ----------
+  $("fCat").addEventListener("change",fillAddDefaults);
+  $("goalSel").addEventListener("change",function(){ setGoal(this.value); });
+  $("applyAll").addEventListener("click",function(){ if(!state.length) return; if(!applyArmed){ applyArmed=true; toast("Tap 'Apply to all' again to reset every exercise to "+GOAL_LABEL[goal]+" ranges."); setTimeout(function(){applyArmed=false;},4500); return; } applyArmed=false; applyRecommendedToAll(); });
+  $("aiToggle").addEventListener("change",function(){ setAi(this.checked); });
+  $("testCoach").addEventListener("click",async function(){
+    toast("Testing coach...");
+    try{ var r=await askCoach({mode:"ping"}); toast(r&&r.message?r.message:"Coach reachable."); }
+    catch(e){ toast("Coach not reachable - deploy the deepseek edge function (see SETUP.md).", true); }
+  });
+  $("addMachineBtn").addEventListener("click",function(){ var n=$("mName").value.trim(); if(!n){ $("mName").focus(); return; } addMachine(n); $("mName").value=""; $("mName").focus(); });
+  $("mName").addEventListener("keydown",function(e){ if(e.key==="Enter") $("addMachineBtn").click(); });
+  $("addBtn").addEventListener("click",function(){
+    var name=$("fName").value.trim(); if(!name){ $("fName").focus(); return; }
+    var cat=$("fCat").value, w=parseFloat($("fWeight").value)||0, lo=parseInt($("fLow").value,10)||8, hi=parseInt($("fHigh").value,10)||12;
+    if(hi<lo){ var t=lo; lo=hi; hi=t; } var inc=parseFloat($("fInc").value)||DEF_INC[cat];
+    addExercise({name:name,cat:cat,weight:w,lo:lo,hi:hi,inc:inc,target:w>0?mid(lo,hi):lo,last:[null,null,null],rec:null,machine_id:$("fMachine").value||null,sort:(state.length?Math.max.apply(null,state.map(function(x){return x.sort||0;}))+1:0)});
+    ["fName","fWeight","fLow","fHigh","fInc"].forEach(function(id){ $(id).value=""; }); $("fMachine").value=""; $("fName").focus();
+  });
+
+  // ---------- routing ----------
+  function route(){
+    if(session){
+      authView.style.display="none"; appView.style.display="block";
+      var meta=session.user.user_metadata||{};
+      goal=meta.goal||"balanced"; $("goalSel").value=goal;
+      aiEnabled=!!meta.aiCoach; $("aiToggle").checked=aiEnabled;
+      $("who").textContent=session.user.email;
+      fillAddDefaults(); showPanel("Console"); loadData();
+    } else {
+      authView.style.display="flex"; appView.style.display="none"; state=[]; machines=[]; list.innerHTML="";
+    }
+  }
+  sb.auth.onAuthStateChange(function(_e,s){ session=s; setTimeout(route,0); });
+  sb.auth.getSession().then(function(r){ session=r.data.session; route(); });
+})();
+</script>
+</body>
+</html>
