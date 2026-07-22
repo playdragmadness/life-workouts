@@ -1,0 +1,12 @@
+const assert=require("node:assert/strict");
+const {deriveCardioTarget,summarizeStrengthEvidence,summarizeCardioEvidence,starterStrengthDays}=require("../calibration-engine.js");
+assert.equal(deriveCardioTarget(0,false).minutes,45,"zero baseline begins gently");
+assert.equal(deriveCardioTarget(100,false).minutes,115,"cardio increases gradually");
+assert.equal(deriveCardioTarget(100,true).minutes,100,"caution never escalates a target");
+assert.equal(starterStrengthDays("new",false),2);
+assert.equal(starterStrengthDays("consistent",true),0);
+const now=Date.now(), cardio=summarizeCardioEvidence([{minutes:50,performed_at:new Date(now-86400000).toISOString()},{minutes:40,performed_at:new Date(now-8*86400000).toISOString()}],100,now);
+assert.equal(cardio.readyToProgress,false); assert.equal(cardio.current,50);
+const report=summarizeStrengthEvidence([{exercise_id:"row",result:"hold",sets:[{r:10,e:"solid"},{r:9,e:"solid"}]}],[{weight:50,reps:10,effort:"solid"}]);
+assert.equal(report.sessions,1); assert.equal(report.movements,1); assert.ok(report.confidence>0);
+console.log("calibration-engine tests passed");
