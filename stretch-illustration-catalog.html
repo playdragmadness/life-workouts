@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Stretch illustration catalogue</title>
+  <style>
+    :root{--ink:#1d2420;--muted:#617068;--line:#d9e0da;--paper:#f6f5f0;--card:#fff;--accent:#2f895f}
+    *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    header{max-width:1180px;margin:0 auto;padding:44px 28px 28px;border-bottom:1px solid var(--line)}
+    h1{margin:0;font-size:clamp(28px,5vw,48px);letter-spacing:-.055em;line-height:1.02} header p{max-width:690px;margin:12px 0 0;color:var(--muted)}
+    .key{display:inline-flex;gap:8px;align-items:center;margin-top:15px;color:var(--muted);font-size:13px}.key i{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+    main{max-width:1180px;margin:0 auto;padding:28px}.catalogue{display:grid;gap:28px}.entry{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(270px,.85fr);gap:28px;padding:0 0 28px;border-bottom:1px solid var(--line)}
+    figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.imagewrap{background:#fbf7ef}.imagewrap img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain}
+    figcaption{padding:10px 13px;color:var(--muted);font-size:12px}.copy{padding:3px 0}.num{display:block;margin-bottom:7px;color:var(--accent);font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}.copy h2{margin:0;font-size:25px;letter-spacing:-.04em;line-height:1.12}.meta{margin:7px 0 20px;color:var(--muted);font-size:13px}.sectionlabel{margin:18px 0 3px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.copy p{margin:0;color:#39443e}.note{margin-top:32px;padding:16px 18px;border-left:3px solid var(--accent);background:#edf4ed;color:#435149;font-size:14px}.back{display:block;margin-top:28px;color:var(--accent);text-decoration:none;font-size:14px;font-weight:700}
+    @media(max-width:720px){header,main{padding-left:18px;padding-right:18px}.entry{grid-template-columns:1fr;gap:16px}.copy{order:-1}.copy h2{font-size:22px}}
+    @media print{body{background:#fff}header{padding-top:22px}.entry{break-inside:avoid}.note,.back{display:none}}
+  </style>
+</head>
+<body>
+  <header id="top">
+    <h1>Stretch illustration catalogue</h1>
+    <p>Review the numbered sequence and note any image you would like re-rendered. The designation appears in the catalogue only—not in the illustration itself.</p>
+    <span class="key"><i></i> 70 original clinical movement illustrations</span>
+  </header>
+  <main>
+    <div id="catalogue" class="catalogue" aria-live="polite"></div>
+    <div class="note">Use a mild stretch sensation, not pain. Change or skip a movement that does not work for your body or clinician-approved plan.</div>
+  </main>
+  <script src="stretch-catalog.js"></script>
+  <script>
+    (function(){
+      var catalogue=document.getElementById("catalogue");
+      var moves=(window.RungStretchCatalog&&window.RungStretchCatalog.all)||[];
+      function esc(value){return String(value).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch];});}
+      catalogue.innerHTML=moves.map(function(move,index){
+        var areas=move.areas.map(function(area){return area.replace(/-/g," ");}).join(" · ");
+        var side=move.bilateral?" per side":"";
+        return '<article class="entry" id="stretch-'+(index+1)+'">'+
+          '<figure><div class="imagewrap"><img src="assets/stretches/'+esc(move.id)+'-v3.png" alt="Clinical illustration showing '+esc(move.name)+'"></div><figcaption>Clinical illustration</figcaption></figure>'+ 
+          '<div class="copy"><span class="num">'+String(index+1).padStart(2,"0")+' · '+esc(areas)+'</span><h2>'+esc(move.name)+'</h2><p class="meta">'+esc(move.hold)+side+'</p><h3 class="sectionlabel">How to do it</h3><p>'+esc(move.how)+'</p><h3 class="sectionlabel">Why it helps</h3><p>'+esc(move.why)+'</p><a class="back" href="#top">Back to top</a></div>'+ 
+        '</article>';
+      }).join("");
+    }());
+  </script>
+</body>
+</html>
