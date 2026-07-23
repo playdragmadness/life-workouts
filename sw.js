@@ -1,16 +1,17 @@
-// Progression service worker — makes the app open offline.
+// Rung service worker — makes the app open offline.
 // Strategy: network-first for the page (so you get updates when online,
 // cached copy when offline); cache-first for static assets; and NEVER
 // touch Supabase API calls (those are handled by the app's write queue).
 
 // Bump this release identifier for each deployment. It keeps an installed app from
 // mixing an old page with new scripts/assets.
-const CACHE = "progression-v30";
+const CACHE = "rung-v34";
 const SHELL = [
   "./",
   "./index.html",
   "./config.js",
   "./manifest.json",
+  "./rung-mark.svg",
   "./icon-192.png",
   "./icon-512.png",
   "./icon-180.png",

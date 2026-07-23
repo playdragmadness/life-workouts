@@ -1,12 +1,12 @@
-# Progression setup
+# Rung setup
 
 ## 1. Create the database
 
 Create a Supabase project, open **SQL Editor**, and run the complete
 [`schema.sql`](schema.sql) file. It is idempotent: re-run it after deploying this
-version even if you used an earlier Progression schema. The v3 migration adds
-workout groups, analytics fields, rest overrides, and the muscle data used for
-custom exercises.
+version even if you used an earlier Rung schema. The current migrations add
+workout groups, analytics fields, rest overrides, adjustable machine settings,
+and the muscle data used for custom exercises.
 
 For a private two-person app, enable Email authentication and choose whether email
 confirmation is appropriate for you. Do not put a Supabase `service_role` key in

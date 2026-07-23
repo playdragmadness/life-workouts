@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Progression — Workout Console</title>
+<title>Rung — Workout Console</title>
 <meta name="theme-color" content="#0D1110">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Progression">
+<meta name="apple-mobile-web-app-title" content="Rung">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
 <script src="progression-engine.js"></script>
 <script src="calibration-engine.js"></script>
@@ -33,17 +33,15 @@
     color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; padding:0 0 64px; line-height:1.45}
   .wrap{max-width:640px; margin:0 auto; padding:0 18px}
 
-  .topbar{display:flex; align-items:center; gap:12px; padding:16px 0 14px; border-bottom:1px solid var(--line); margin-bottom:20px; position:relative}
-  .burger{background:transparent; border:1px solid var(--line); border-radius:9px; width:42px; height:38px; cursor:pointer;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; flex-shrink:0}
-  .burger span{display:block; width:18px; height:2px; background:var(--ink); border-radius:2px}
+  .topbar{display:flex; align-items:center; gap:12px; padding:16px 0 14px; border-bottom:1px solid var(--line); margin-bottom:20px}
   .brand{display:flex; align-items:baseline; gap:9px}
   .brand h1{font-size:20px; margin:0; letter-spacing:-.02em; font-weight:800}
-  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--go); box-shadow:0 0 10px var(--go); align-self:center}
+  .brandmark{width:28px;height:28px;display:grid;place-content:center;color:var(--go);flex-shrink:0}
+  .brandmark svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
   .ptitle{margin-left:auto; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
   .syncbadge{font-family:var(--mono); font-size:10px; color:var(--hold); border:1px solid rgba(242,180,60,.4); border-radius:6px; padding:3px 7px; margin-left:8px; white-space:nowrap}
 
-  .drawer{display:none; position:absolute; top:100%; left:0; right:0; z-index:40;
+  .drawer{display:none; position:fixed; bottom:88px; left:50%; right:auto; transform:translateX(-50%); width:min(480px,calc(100vw - 40px)); z-index:40;
     background:var(--panel2); border:1px solid var(--line); border-radius:12px; margin-top:6px; overflow:hidden}
   .drawer.open{display:block}
   .drawer button{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:transparent;
@@ -302,19 +300,21 @@
   .wrap{max-width:700px;padding:0 20px}
   .topbar{padding:20px 0 16px;margin-bottom:26px;border-color:var(--line)}
   .brand{align-items:center}.brand .dot{width:14px;height:14px;border-radius:5px;background:linear-gradient(145deg,var(--go),#35af77);box-shadow:0 5px 16px rgba(113,223,159,.27)}.brand .dot:after{content:"";display:block;width:5px;height:5px;margin:4.5px;border-radius:2px;background:#102119}.brand h1{font-size:18px;letter-spacing:-.035em}.ptitle{font-size:10px;color:var(--faint)}
-  .burger{order:3;margin-left:4px;width:38px;height:36px;border-color:var(--line);background:rgba(255,255,255,.025)}.burger span{width:15px;background:var(--dim)}.syncbadge{margin-left:auto;order:2}.drawer{left:auto;width:min(290px,calc(100vw - 40px));right:0;background:#18201ddd;border-color:var(--line);backdrop-filter:blur(16px);border-radius:17px}.drawer button{border-color:var(--line);padding:13px 15px}.drawer button.active{color:var(--go)}
+  .brandmark{width:30px;height:30px}.brandmark svg{width:30px;height:30px}.syncbadge{margin-left:auto;order:2}.drawer{left:50%;right:auto;bottom:88px;width:min(480px,calc(100vw - 40px));background:#18201ddd;border-color:var(--line);backdrop-filter:blur(16px);border-radius:17px}.drawer button{border-color:var(--line);padding:13px 15px}.drawer button.active{color:var(--go)}
   .card,.calcard,.sect,.educard,.chartcard{background:linear-gradient(145deg,rgba(33,43,38,.94),rgba(18,24,21,.98));border-color:var(--line);border-radius:20px;box-shadow:inset 0 1px rgba(255,255,255,.035)}
   .card{padding:18px 17px 16px}.name{font-size:18px}.weight{font-size:29px}.setrow input,.field input,.field select,.noterow input,.planform input,.planform select{background:#101513;border-color:var(--line)}
   .addbtn,.primary{background:linear-gradient(110deg,#bdf2a1,#72dfa1);color:#122218;border-radius:13px;font-weight:800}.ghostmini,.btnline{border-color:var(--line);color:var(--dim);border-radius:11px}.planbtn{border-color:var(--line);border-radius:13px;background:rgba(255,255,255,.025)}.planbtn.go{background:linear-gradient(110deg,#bdf2a1,#72dfa1);border-radius:12px}.workoutbar{background:rgba(148,184,255,.07);border-color:rgba(148,184,255,.2);border-radius:14px}.counts{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:20px 0}.filterbar select,.picker select{background:#111613;border-color:var(--line);border-radius:12px}
   .calstatus,.calconsole{border-radius:15px}.calcard{padding:19px}.educard{padding:20px}.eduhero{font-size:14px;color:var(--dim)}
   .todayview{padding-bottom:8px}.todaydate{font:10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--go);margin-bottom:9px}.todayhead h2{font-size:36px;letter-spacing:-.065em;line-height:.96;margin:0;max-width:400px}.todayhead p{color:var(--dim);font-size:14px;margin:12px 0 23px}.todayprimary{position:relative;overflow:hidden;text-align:left;width:100%;min-height:198px;padding:20px;border:1px solid rgba(187,244,197,.4);border-radius:23px;background:linear-gradient(135deg,#2b4d3c,#183225 56%,#2b5945);color:var(--ink);box-shadow:inset 0 1px rgba(255,255,255,.14),0 14px 32px rgba(0,0,0,.2)}.todayprimary:after{content:"";position:absolute;width:235px;height:235px;right:-72px;bottom:-136px;border-radius:50%;border:1px solid rgba(217,255,190,.22);box-shadow:0 0 0 27px rgba(217,255,190,.07),0 0 0 55px rgba(217,255,190,.045)}.todayprimary .eyebrow{position:relative;z-index:1;font:10px var(--mono);letter-spacing:.13em;text-transform:uppercase;color:#d9f8df}.todayprimary strong{position:relative;z-index:1;display:block;font-size:25px;letter-spacing:-.045em;margin:13px 0 4px}.todayprimary p{position:relative;z-index:1;color:#d5e9dc;font-size:13px;margin:0}.todayprimary .goarrow{position:absolute;z-index:2;right:16px;bottom:16px;width:44px;height:44px;border-radius:50%;display:grid;place-content:center;background:#cef3a7;color:#132519;font-size:25px}.todayquick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 27px}.quickaction{padding:12px 1px 8px;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink)}.quickaction .qi{font:18px var(--mono);color:var(--leg)}.quickaction b{display:block;font-size:14px;margin:9px 0 3px}.quickaction span:last-child{display:block;color:var(--dim);font-size:11px;line-height:1.35}.weekly{border-top:1px solid var(--line);padding-top:17px}.weeklyhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.weeklyhead h3{margin:0;font-size:15px;letter-spacing:-.025em}.weeklyhead button{background:none;border:0;color:var(--faint);font-size:12px}.metric{display:grid;grid-template-columns:75px 1fr auto;align-items:center;gap:10px;margin:14px 0}.metric label{font-size:12px;font-weight:700}.metric .track{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.metric .fill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#32b57b,var(--go));transition:width .35s}.metric.amber .fill{background:linear-gradient(90deg,#d47a4a,var(--hold))}.metric.red .fill{background:linear-gradient(90deg,#bd5c64,#ed9690)}.metric small{font:10px var(--mono);color:var(--dim);white-space:nowrap}.todayinsight{margin-top:22px;padding:13px 14px;border:1px solid rgba(220,246,223,.12);background:rgba(234,247,235,.08);border-radius:14px;font-size:12px;line-height:1.45;color:#c1cdc4}.todayinsight b{color:var(--ink)}
-  .appdock{position:fixed;z-index:38;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(480px,calc(100% - 40px));height:58px;display:flex;align-items:center;justify-content:space-around;padding:7px;border:1px solid var(--line);border-radius:20px;background:rgba(22,30,27,.93);box-shadow:0 16px 40px rgba(0,0,0,.36);backdrop-filter:blur(18px)}.appdock button{width:39px;height:38px;background:transparent;border:0;border-radius:12px;color:var(--faint);font:18px system-ui,sans-serif}.appdock button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}.appdock button.active{background:var(--go);color:#112218}.appdock #openMore{font-size:21px}
+  .appdock{position:fixed;z-index:38;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(480px,calc(100% - 40px));height:58px;display:flex;align-items:center;justify-content:space-around;padding:7px;border:1px solid var(--line);border-radius:20px;background:rgba(22,30,27,.93);box-shadow:0 16px 40px rgba(0,0,0,.36);backdrop-filter:blur(18px)}.appdock button{width:39px;height:38px;background:transparent;border:0;border-radius:12px;color:var(--faint);font:18px system-ui,sans-serif}.appdock button svg,.quickaction .qi svg,.drawer .ic svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}.appdock button.active{background:var(--go);color:#112218}.appdock #openMore{display:grid;place-content:center}
+  .quickaction .qi{display:block;height:21px;color:var(--leg)}.drawer .ic{display:grid;place-content:center;width:19px;height:19px}
+  .measurementrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}.measurementrow[hidden]{display:none}
   .goalsintro{margin-bottom:17px}.goalsintro h2{font-size:30px;line-height:1;letter-spacing:-.055em;margin:5px 0 10px}.goalsintro p{color:var(--dim);font-size:14px;margin:0}.goalform{display:grid;gap:11px}.goalrow{display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.goalrow:last-child{border:0}.goalrow b{font-size:14px}.goalrow span{display:block;font-size:12px;color:var(--dim);margin-top:2px}.goalrow select{width:100%;background:#101513;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:13px}.research{margin-top:15px}.research h3{font-size:17px;letter-spacing:-.025em}.research ul{padding-left:18px;margin:10px 0;color:var(--dim);font-size:13px;line-height:1.55}.research strong{color:var(--ink)}.research a{color:var(--leg);text-decoration:none}.goalnotice{margin-top:13px;padding:11px 12px;border-left:3px solid var(--hold);background:rgba(243,183,131,.07);font-size:12px;color:var(--dim);line-height:1.45}
   .library{margin:0 0 18px;padding:16px;background:linear-gradient(145deg,rgba(31,46,38,.96),rgba(18,25,21,.98));border:1px solid var(--line);border-radius:19px}.libraryhead{display:flex;align-items:center;justify-content:space-between;gap:12px}.libraryhead h3{margin:0;font-size:16px;letter-spacing:-.025em}.libraryhead p{margin:3px 0 0;color:var(--dim);font-size:12px}.librarytools{display:grid;grid-template-columns:1fr 118px;gap:8px;margin-top:13px}.librarytools input,.librarytools select{width:100%;background:#101513;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px}.libraryresults{display:grid;gap:7px;margin-top:11px;max-height:360px;overflow:auto}.libraryrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.libraryrow:last-child{border:0}.libraryrow b{display:block;font-size:14px}.libraryrow span{display:block;margin-top:3px;color:var(--dim);font:10px var(--mono);letter-spacing:.05em;text-transform:uppercase}.libraryrow button{padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--ink);font-size:12px}.libraryrow button:hover{border-color:var(--go);color:var(--go)}.libraryempty{color:var(--faint);font-size:12px;padding:8px 0}.equipmentnudge{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding:12px 13px;border:1px solid rgba(148,184,255,.2);border-radius:14px;background:rgba(148,184,255,.06);font-size:12px;color:var(--dim)}.equipmentnudge b{display:block;color:var(--ink);font-size:13px;margin-bottom:2px}.equipmentnudge button{padding:8px 10px;flex-shrink:0}.equipmentrow{display:flex;gap:10px;align-items:center;margin-top:10px}.equipmentrow select{flex:1;background:#101513;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:13px}
   .templates{margin:15px 0 20px;padding:16px;background:linear-gradient(145deg,rgba(30,42,36,.9),rgba(18,25,21,.97));border:1px solid var(--line);border-radius:19px}.templatehead{display:flex;align-items:center;justify-content:space-between;gap:12px}.templatehead h3{margin:0;font-size:16px;letter-spacing:-.025em}.templatehead p{margin:3px 0 0;color:var(--dim);font-size:12px}.templateempty{padding:13px 0 2px;color:var(--faint);font-size:12px}.templaterowitem{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.templaterowitem:last-child{border:0}.templaterowitem b{display:block;font-size:14px}.templaterowitem span{display:block;margin-top:2px;color:var(--dim);font-size:11px}.templaterowitem button{padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--ink);font-size:12px}.templatebuilder{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.templatehint{margin:9px 0;color:var(--faint);font-size:11px;line-height:1.45}.templateexercises{display:grid;gap:5px;max-height:260px;overflow:auto;margin:12px 0}.templatecheck{display:flex;align-items:center;gap:9px;padding:9px 1px;color:var(--dim);font-size:13px}.templatecheck input{accent-color:var(--go)}.templaterow{display:flex;gap:9px;justify-content:flex-end}.templaterow .addbtn{width:auto;margin:0;padding:9px 12px}
   .strengthsuggest{padding:18px;background:linear-gradient(145deg,rgba(35,55,44,.96),rgba(19,28,24,.99));border:1px solid var(--line);border-radius:20px}.strengthsuggest .eyebrow{font:10px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--go)}.strengthsuggest h2{margin:6px 0 5px;font-size:23px;letter-spacing:-.04em}.strengthsuggest p{margin:0 0 15px;color:var(--dim);font-size:13px;line-height:1.45}.strengthsuggest .suggestactions{display:grid;gap:8px}.strengthsuggest .startsuggested{background:linear-gradient(110deg,#bdf2a1,#72dfa1);color:#122218;border:0;border-radius:12px;padding:12px;font-weight:800}.strengthsuggest .customplan{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:11px;font-weight:650}
   .cardioentry{margin:2px 0 18px}.cardioentry>p,.cardioflowstep>p{margin:7px 0 14px;color:var(--dim);font-size:13px;line-height:1.45}.cardioentryactions{display:grid;gap:9px}.cardioentrychoice{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;width:100%;padding:14px;border:1px solid var(--line);border-radius:15px;background:#101513;color:var(--ink);text-align:left;font:inherit}.cardioentrychoice.primary{border-color:rgba(187,244,197,.42);background:linear-gradient(120deg,#294a39,#183124)}.cardioentryicon{display:grid;place-content:center;width:33px;height:33px;border-radius:10px;background:rgba(255,255,255,.1);font:18px var(--mono);color:#d7f4cc}.cardioentrychoice b{display:block;font-size:14px}.cardioentrychoice span:not(.cardioentryicon){display:block;margin-top:2px;color:var(--dim);font-size:11px}.cardioentrychoice.primary span:not(.cardioentryicon){color:#cce1d2}.cardioentryarrow{font-size:20px;color:var(--go)}.cardioflow{margin:0 0 18px}.cardiosteps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 14px}.cardiostepdot{padding:8px 4px;border-bottom:2px solid var(--line);font:10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:center}.cardiostepdot.active{color:var(--go);border-color:var(--go)}.cardioflowstep{display:none}.cardioflowstep.active{display:block}.cardiochoices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.cardiochoice{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:13px;background:#101513;color:var(--ink);text-align:left;font:inherit;cursor:pointer}.cardiochoice:hover,.cardiochoice.active{border-color:var(--go);background:rgba(113,223,159,.1)}.cardiochoice .cardioicon{width:28px;height:28px;display:grid;place-content:center;border-radius:9px;color:var(--leg);background:rgba(148,184,255,.11)}.cardiochoice .cardioicon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.cardiochoice b{display:block;font-size:13px}.cardiochoice span:last-child{display:block;color:var(--dim);font-size:10px;margin-top:2px}.intensitylist{display:grid;gap:9px;margin:14px 0}.intensityrow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#101513}.intensityrow b{font-size:13px}.intensityrow span{display:block;color:var(--dim);font-size:11px;margin-top:2px}.intensityrow input{width:74px;background:transparent;color:var(--ink);border:0;border-bottom:1px solid var(--line);padding:5px 1px;font:600 18px var(--mono);text-align:right}.intensityrow input:focus{outline:none;border-color:var(--go)}.intensitytotal{display:flex;justify-content:space-between;align-items:baseline;margin:13px 0;font-size:13px;color:var(--dim)}.intensitytotal b{font:600 24px var(--mono);color:var(--ink)}.cardioflowactions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.cardioflowactions .addbtn{margin:0}.cardioflowactions .btnline{padding:11px}.cardiodetails{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.cardiodetails .full{grid-column:1/-1}.cardioapplenote{margin-top:13px;padding:11px 12px;border-left:3px solid var(--leg);background:rgba(148,184,255,.07);color:var(--dim);font-size:12px;line-height:1.45}.cardiohistorymeta{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:5px}.cardiolive{margin:2px 0 18px}.liveworkout{padding:16px;border:1px solid rgba(187,244,197,.32);border-radius:17px;background:radial-gradient(circle at 85% 10%,rgba(155,239,156,.16),transparent 33%),linear-gradient(135deg,#244331,#13261c)}.livetop{display:flex;align-items:center;justify-content:space-between;gap:12px}.livelabel{font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#d8f7cf}.livechange{padding:6px 8px;border:1px solid rgba(217,255,190,.2);border-radius:8px;background:rgba(0,0,0,.1);color:#cde1d3;font-size:11px}.livetimer{margin:17px 0 2px;font:500 53px/1 var(--mono);letter-spacing:-.075em;color:#f1f8eb}.livestate{margin:0;color:#c5dbcc;font-size:12px}.liveintensity{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:17px 0 5px}.liveintensity button{padding:10px 4px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:rgba(0,0,0,.14);color:#cfddd1;font-size:12px}.liveintensity button.active{border-color:#c6f2a9;background:#c6f2a9;color:#15301e;font-weight:800}.livehint{min-height:17px;margin:7px 0 0;color:#c6d9cc;font-size:11px}.livefinish{background:#d8f5b6!important}.livecancel{display:block;width:100%;margin-top:10px;border:0;background:transparent;color:var(--faint);font-size:12px}
-  .stretchhero{margin:2px 0 17px}.stretchhero h2{margin:5px 0 7px;font-size:29px;letter-spacing:-.055em;line-height:1}.stretchhero p{margin:0;color:var(--dim);font-size:13px}.stretchweek{margin:15px 0 18px}.stretchweekline{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--dim)}.stretchweekline b{color:var(--ink)}.stretchtrack{height:7px;margin-top:7px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.09)}.stretchtrack i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--leg),var(--go));transition:width .3s}.stretchsession{padding:17px;background:linear-gradient(145deg,rgba(34,49,43,.96),rgba(17,25,22,.98));border:1px solid var(--line);border-radius:19px}.stretchsessionhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.stretchsessionhead h3{margin:3px 0 0;font-size:19px;letter-spacing:-.03em}.stretchsessionhead span{font:11px var(--mono);color:var(--dim)}.stretchsessionnote{margin:6px 0 10px;color:var(--dim);font-size:12px}.stretchlist{display:grid}.stretchchoice{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:11px 0;border:0;border-top:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font:inherit}.stretchchoice.active{color:var(--go)}.stretchchoice .stretchdot{width:21px;height:21px;display:grid;place-content:center;border-radius:7px;background:rgba(148,184,255,.1);color:var(--leg);font-size:12px}.stretchchoice.active .stretchdot{background:rgba(113,223,159,.12);color:var(--go)}.stretchchoice b{display:block;font-size:13px}.stretchchoice small{display:block;margin-top:2px;color:var(--dim);font-size:10px}.stretchchoice .chev{font-size:20px;color:var(--faint)}.stretchdetail{margin-top:15px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#101513}.stretchdetailtop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.stretchdetailtop h3{margin:0;font-size:17px;letter-spacing:-.03em}.stretchdetailtop span{font:10px var(--mono);color:var(--dim);text-align:right}.stretchframes{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:13px 0}.stretchframes.illustrated{grid-template-columns:1fr}.stretchframe{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:radial-gradient(circle at 50% 20%,rgba(148,184,255,.1),transparent 48%),#151b18}.stretchframe svg{display:block;width:100%;height:145px;color:var(--ink)}.stretchframe img{display:block;width:100%;max-height:270px;object-fit:cover;background:#f7f2e9}.stretchframe .sl{fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.stretchframe .sf{stroke:var(--faint);stroke-width:2.4}.stretchframe .sa{stroke:var(--go);stroke-width:2.6;stroke-dasharray:3 4}.stretchframecaption{padding:7px 9px;border-top:1px solid var(--line);color:var(--dim);font:10px var(--mono);text-transform:uppercase;letter-spacing:.05em}.stretchcues{margin:0;padding-left:18px;color:var(--dim);font-size:12px;line-height:1.5}.stretchcaution{margin:13px 0 0;padding:10px 11px;border-left:3px solid var(--hold);background:rgba(243,183,131,.07);color:var(--dim);font-size:11px;line-height:1.45}.stretchtools{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:14px}.stretchtools select{min-width:0;background:#101513;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px}.stretchtools .btnline{padding:9px 10px;font-size:12px}
+  .stretchhero{margin:2px 0 17px}.stretchhero h2{margin:5px 0 7px;font-size:29px;letter-spacing:-.055em;line-height:1}.stretchhero p{margin:0;color:var(--dim);font-size:13px}.stretchweek{margin:15px 0 18px}.stretchweekline{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--dim)}.stretchweekline b{color:var(--ink)}.stretchtrack{height:7px;margin-top:7px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.09)}.stretchtrack i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--leg),var(--go));transition:width .3s}.stretchsession{padding:17px;background:linear-gradient(145deg,rgba(34,49,43,.96),rgba(17,25,22,.98));border:1px solid var(--line);border-radius:19px}.stretchsessionhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.stretchsessionhead h3{margin:3px 0 0;font-size:19px;letter-spacing:-.03em}.stretchsessionhead span{font:11px var(--mono);color:var(--dim)}.stretchsessionnote{margin:6px 0 10px;color:var(--dim);font-size:12px}.stretchlist{display:grid}.stretchchoice{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:11px 0;border:0;border-top:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font:inherit}.stretchchoice.active{color:var(--go)}.stretchchoice .stretchdot{width:21px;height:21px;display:grid;place-content:center;border-radius:7px;background:rgba(148,184,255,.1);color:var(--leg);font-size:12px}.stretchchoice.active .stretchdot{background:rgba(113,223,159,.12);color:var(--go)}.stretchchoice b{display:block;font-size:13px}.stretchchoice small{display:block;margin-top:2px;color:var(--dim);font-size:10px}.stretchchoice .chev{font-size:20px;color:var(--faint)}.stretchdetail{margin-top:15px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#101513}.stretchdetailtop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.stretchdetailtop h3{margin:0;font-size:17px;letter-spacing:-.03em}.stretchdetailtop span{font:10px var(--mono);color:var(--dim);text-align:right}.stretchframes{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:13px 0}.stretchframes.illustrated{grid-template-columns:1fr}.stretchframe{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:radial-gradient(circle at 50% 20%,rgba(148,184,255,.1),transparent 48%),#151b18}.stretchframe svg{display:block;width:100%;height:145px;color:var(--ink)}.stretchframe img{display:block;width:100%;max-height:270px;object-fit:cover;background:#f7f2e9}.stretchmissing{display:grid;min-height:160px;place-content:center;padding:24px;text-align:center;color:var(--dim);font-size:12px;line-height:1.5;background:linear-gradient(145deg,rgba(242,180,60,.08),transparent)}.stretchframe .sl{fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.stretchframe .sf{stroke:var(--faint);stroke-width:2.4}.stretchframe .sa{stroke:var(--go);stroke-width:2.6;stroke-dasharray:3 4}.stretchframecaption{padding:7px 9px;border-top:1px solid var(--line);color:var(--dim);font:10px var(--mono);text-transform:uppercase;letter-spacing:.05em}.stretchcues{margin:0;padding-left:18px;color:var(--dim);font-size:12px;line-height:1.5}.stretchcaution{margin:13px 0 0;padding:10px 11px;border-left:3px solid var(--hold);background:rgba(243,183,131,.07);color:var(--dim);font-size:11px;line-height:1.45}.stretchtools{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:14px}.stretchtools select{min-width:0;background:#101513;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px}.stretchtools .btnline{padding:9px 10px;font-size:12px}
   .stretchstartrow{display:grid;grid-template-columns:116px 1fr;gap:9px;align-items:end;margin-top:14px}.stretchstartrow label{display:grid;gap:5px;color:var(--dim);font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em}.stretchstartrow select,.stretchaddrow select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#101513;color:var(--ink);font:13px inherit}.stretchcustom{margin-top:15px;padding:16px 17px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.stretchcustom .ghostmini{padding:8px 10px}.customstretchlist{display:grid;gap:2px}.customstretchrow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:11px 0;border-top:1px solid var(--line)}.customstretchrow b{display:block;font-size:13px}.customstretchrow span{display:block;margin-top:2px;color:var(--dim);font-size:10px}.customstretchrow button{padding:7px 9px;font-size:11px}.customstretchbuilder{margin-top:13px;padding-top:13px;border-top:1px solid var(--line)}.stretchaddrow{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.customstretchmoves{display:grid;gap:2px;margin:11px 0}.customstretchmove{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}.customstretchmove button{border:0;background:none;color:var(--danger);font-size:12px}.stretchbuilderactions,.stretchtimeractions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.stretchtimer{margin:15px 0;padding:22px 18px;text-align:center;border:1px solid rgba(187,244,197,.32);border-radius:20px;background:linear-gradient(145deg,#263f31,#15261e)}.stretchtimer h3{margin:6px 0 5px;font-size:24px;letter-spacing:-.04em}.stretchtimer p{min-height:36px;margin:0;color:#cee0d3;font-size:12px;line-height:1.4}.stretchclock{margin:14px 0 10px;font:600 56px var(--mono);letter-spacing:-.08em;color:#e4f8d7}.stretchprogress{height:7px;overflow:hidden;border-radius:99px;background:rgba(255,255,255,.12)}.stretchprogress i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#d8ed9d,var(--go));transition:width .3s}.stretchhow{color:var(--dim);font-size:12px;line-height:1.55}.stretchhow b{display:block;margin-top:12px;color:var(--ink);font-size:12px}.stretchhow p{margin:3px 0 0}.stretchhow b:first-child{margin-top:0}
   @media(max-width:520px){.wrap{padding:0 16px}.topbar{margin-bottom:22px}.todayhead h2{font-size:33px}.todayprimary{min-height:184px}.metric{grid-template-columns:67px 1fr auto}.goalrow{grid-template-columns:1fr 106px}.appdock{width:calc(100% - 28px)}}
 </style>
@@ -324,7 +324,7 @@
 <!-- ===== AUTH ===== -->
 <div class="wrap authwrap" id="authView" style="display:none">
   <div class="authcard">
-    <div class="brand"><span class="dot"></span><h1>Progression</h1></div>
+    <div class="brand"><span class="brandmark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 7v18M23 7v18M9 12h14M9 18h14"/><path d="M3 7h26M5 4v6M27 4v6"/></svg></span><h1>Rung</h1></div>
     <div class="sub">Track your training</div>
     <label>Email</label><input id="aEmail" type="email" autocomplete="email" placeholder="you@example.com">
     <label>Password</label><input id="aPass" type="password" autocomplete="current-password" placeholder="password">
@@ -335,22 +335,21 @@
 <!-- ===== APP ===== -->
 <div class="wrap" id="appView" style="display:none">
   <div class="topbar">
-    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
-    <div class="brand"><span class="dot"></span><h1>Progression</h1></div>
+    <div class="brand"><span class="brandmark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 7v18M23 7v18M9 12h14M9 18h14"/><path d="M3 7h26M5 4v6M27 4v6"/></svg></span><h1>Rung</h1></div>
     <div class="ptitle" id="ptitle">Console</div>
     <span class="syncbadge" id="syncbadge" style="display:none"></span>
     <div class="drawer" id="drawer">
-      <button data-panel="Today"><span class="ic">•</span> Today</button>
-      <button data-panel="Console"><span class="ic">=</span> Strength training</button>
-      <button data-panel="Cardio"><span class="ic">♥</span> Cardio</button>
-      <button data-panel="Stretch"><span class="ic">⌁</span> Stretch</button>
+      <button data-panel="Today"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-7 8 7v9H4zM9 20v-5h6v5"/></svg></span> Today</button>
+      <button data-panel="Console"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg></span> Strength training</button>
+      <button data-panel="Cardio"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="1.7"/><path d="M12 6v6l-3 3m3-6 4 3m-7 3-2 5m5-5 5 3"/></svg></span> Cardio</button>
+      <button data-panel="Stretch"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="1.7"/><path d="M12 6v6m0-5-3-3m3 3 3-3m-3 8-2.5 7M12 12l3.5 3.5-2.5 3.5"/></svg></span> Stretch</button>
       <button data-panel="Goals"><span class="ic">◎</span> Goals</button>
       <button data-panel="History"><span class="ic">H</span> History log</button>
       <button data-panel="Visualize"><span class="ic">~</span> Data visualizer</button>
       <button data-panel="Report"><span class="ic">R</span> Coach report</button>
       <button data-panel="Education"><span class="ic">i</span> Education</button>
       <button data-panel="Calibration"><span class="ic">+</span> Starting point</button>
-      <button data-panel="Settings"><span class="ic">*</span> Settings</button>
+      <button data-panel="Settings"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg></span> Settings</button>
     </div>
   </div>
 
@@ -359,8 +358,8 @@
     <div class="todayhead"><div class="todaydate" id="todayDate">Today</div><h2 id="todayHeading">Build a little momentum.</h2><p id="todayIntro">Your next useful session is ready when you are.</p></div>
     <button class="todayprimary" id="todayBuildStrength"><span class="eyebrow" id="todayPrimaryLabel">Recommended next</span><strong id="todayPrimaryTitle">Strength workout</strong><p id="todayPrimaryMeta">Set your starting point to build a workout.</p><span class="goarrow">→</span></button>
     <div class="todayquick">
-      <button class="quickaction" id="todayLogCardio"><span class="qi">◒</span><b>Log cardio</b><span>Walk, run, ride, or class.</span></button>
-      <button class="quickaction" id="todayLearnMobility"><span class="qi">⌁</span><b>Move &amp; stretch</b><span>Five minutes is a good start.</span></button>
+      <button class="quickaction" id="todayLogCardio"><span class="qi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="1.7"/><path d="M12 6v6l-3 3m3-6 4 3m-7 3-2 5m5-5 5 3"/></svg></span><b>Log cardio</b><span>Walk, run, ride, or class.</span></button>
+      <button class="quickaction" id="todayLearnMobility"><span class="qi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="1.7"/><path d="M12 6v6m0-5-3-3m3 3 3-3m-3 8-2.5 7M12 12l3.5 3.5-2.5 3.5"/></svg></span><b>Move &amp; stretch</b><span>Five minutes is a good start.</span></button>
     </div>
     <section class="weekly"><div class="weeklyhead"><h3>This week</h3><button id="todayOpenGoals">View goals</button></div>
       <div class="metric" id="todayStrengthMetric"><label>Strength</label><div class="track"><i class="fill" id="todayStrengthBar"></i></div><small id="todayStrength">—</small></div>
@@ -428,7 +427,7 @@
         <div class="field"><label>Weight increment (<span data-unit>lb</span>)</label><input id="fInc" type="number" inputmode="decimal" placeholder="5"></div>
         <div class="field"><label>Rest (seconds)</label><input id="fRest" type="number" inputmode="numeric" placeholder="category default"></div>
         <div class="field"><label>Warm-up sets</label><input id="fWarmups" type="number" min="0" max="5" inputmode="numeric" placeholder="0"></div>
-        <div class="field full"><label>Other muscles worked <span class="optional">(optional)</span></label><div class="musclechips" id="fOtherMuscles" aria-label="Other muscles worked"></div><p class="fieldhint">Select the muscles that also work. Progression uses them to avoid suggesting an exercise when those areas are still recovering.</p></div>
+        <div class="field full"><label>Other muscles worked <span class="optional">(optional)</span></label><div class="musclechips" id="fOtherMuscles" aria-label="Other muscles worked"></div><p class="fieldhint">Select the muscles that also work. Rung uses them to avoid suggesting an exercise when those areas are still recovering.</p></div>
       </div>
       <div id="recNote" class="recnote"></div>
       <button class="addbtn" id="addBtn">Add to console</button>
@@ -619,7 +618,7 @@
       <h3>Exercise safety</h3>
       <p>Has a clinician told you to avoid or limit exercise, or do you currently have chest pain with activity, unexplained fainting/dizziness, severe shortness of breath, or a new injury that makes exercise unsafe?</p>
       <select id="calCaution"><option value="no">No / none of these apply</option><option value="yes">Yes</option><option value="unsure">I’m not sure</option></select>
-      <div class="calnotice">If you choose Yes or Unsure, Progression will not raise your starter targets. Get medical advice before starting or increasing exercise. Seek urgent care for severe or sudden symptoms.</div>
+      <div class="calnotice">If you choose Yes or Unsure, Rung will not raise your starter targets. Get medical advice before starting or increasing exercise. Seek urgent care for severe or sudden symptoms.</div>
     </section>
 
     <section class="calcard">
@@ -635,7 +634,7 @@
       <div class="edukicker">Optional context</div>
       <h3>Height and weight</h3>
       <p>BMI is only a screening number. It does not set workout loads or define fitness.</p>
-      <div class="grid"><div class="field"><label>Height (inches)</label><input id="calHeight" type="number" inputmode="decimal" min="36" max="96" placeholder="optional"></div><div class="field"><label>Weight (<span data-unit>lb</span>)</label><input id="calWeight" type="number" inputmode="decimal" min="50" max="700" placeholder="optional"></div></div>
+      <div class="grid"><div class="field full"><label>Measurements</label><select id="calMeasurementSystem"><option value="imperial">Imperial (ft, in, lb)</option><option value="metric">Metric (cm, kg)</option></select></div><div class="field full"><div class="measurementrow" id="calImperialHeight"><div><label>Height · feet</label><input id="calHeightFeet" type="number" inputmode="numeric" min="3" max="8" placeholder="optional"></div><div><label>Height · inches</label><input id="calHeightInches" type="number" inputmode="numeric" min="0" max="11" placeholder="0–11"></div></div><div class="measurementrow" id="calMetricHeight" hidden><div style="grid-column:1/-1"><label>Height · centimeters</label><input id="calHeightCm" type="number" inputmode="decimal" min="90" max="245" placeholder="optional"></div></div></div><div class="field"><label id="calWeightLabel">Weight (lb)</label><input id="calWeight" type="number" inputmode="decimal" min="20" max="700" placeholder="optional"></div></div>
       <div class="bmiout" id="calBmi">BMI: optional</div>
     </section>
 
@@ -673,7 +672,7 @@
 
     <div class="sect">
       <h3>Functional needs & access</h3>
-      <div class="stext">Tell Progression about anything that affects how you move. This is not medical advice or a diagnosis; it keeps automatic increases off and changes suggestion behavior where the app can do so safely.</div>
+      <div class="stext">Tell Rung about anything that affects how you move. This is not medical advice or a diagnosis; it keeps automatic increases off and changes suggestion behavior where the app can do so safely.</div>
       <div class="needchips" id="settingsFunctionalChips"></div>
       <div class="needfield"><label for="settingsFunctionalNote">Anything else the app should keep in mind?</label><textarea id="settingsFunctionalNote" maxlength="400" placeholder="Optional — movements, positions, or equipment to avoid."></textarea></div>
       <button class="btnline" id="saveFunctionalNeeds" style="margin-top:12px">Save functional needs</button>
@@ -724,11 +723,11 @@
     </div>
   </div>
   <nav class="appdock" aria-label="Primary navigation">
-    <button data-panel="Today" aria-label="Today">⌂</button>
+    <button data-panel="Today" aria-label="Today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-7 8 7v9H4zM9 20v-5h6v5"/></svg></button>
     <button data-panel="Console" aria-label="Strength training"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg></button>
-    <button data-panel="Cardio" aria-label="Cardio"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="15.5" cy="4.5" r="1.8"/><path d="m11.5 9 3.5 1.7 2.4 3.2M11.5 9 9 13l3.1 2.1-3.5 4M12.1 15.1l4.6 3.4M9 13l-4 2"/></svg></button>
-    <button data-panel="Stretch" id="openStretch" aria-label="Stretching"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="1.8"/><path d="M12 6v7m0-5-4-2m4 2 4-2m-4 7v7m0-5 4 2 2-2"/></svg></button>
-    <button id="openMore" aria-label="More">⚙</button>
+    <button data-panel="Cardio" aria-label="Cardio"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="1.7"/><path d="M12 6v6l-3 3m3-6 4 3m-7 3-2 5m5-5 5 3"/></svg></button>
+    <button data-panel="Stretch" id="openStretch" aria-label="Stretching"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4" r="1.7"/><path d="M12 6v6m0-5-3-3m3 3 3-3m-3 8-2.5 7M12 12l3.5 3.5-2.5 3.5"/></svg></button>
+    <button id="openMore" aria-label="Menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg></button>
   </nav>
 </div>
 
@@ -754,7 +753,7 @@
   function showSetupNotice(msg){
     document.body.innerHTML =
       '<div class="wrap" style="max-width:430px;padding-top:64px"><div class="authcard">'
-      +'<div class="brand" style="justify-content:center"><span class="dot"></span><h1>Progression</h1></div>'
+      +'<div class="brand" style="justify-content:center"><span class="brandmark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 7v18M23 7v18M9 12h14M9 18h14"/><path d="M3 7h26M5 4v6M27 4v6"/></svg></span><h1>Rung</h1></div>'
       +'<div class="sub">'+(msg||"Add your Supabase keys to connect")+'</div>'
       +'<p style="color:var(--dim);font-size:13px;line-height:1.65">Create <code style="font-family:var(--mono);color:var(--ink)">config.js</code> from <code style="font-family:var(--mono);color:var(--ink)">config.example.js</code>, paste your <b>Project URL</b> and <b>anon key</b>, then reload.</p>'
       +'</div></div>';
@@ -796,10 +795,10 @@
   function prefersSupportedMovements(){ return limitationIds().indexOf("balance_standing")>=0; }
   function isSupportedExercise(ex){ return !!ex.machine_id||/\b(seated|machine|leg press|leg extension|chest press)\b/i.test(ex.name||""); }
   function functionalPlanAdjustment(pool){
-    if(requiresUserChosenMovements()) return {pool:pool,manual:true,note:"Your profile includes a limb or hand-use consideration, so Progression will not guess an accessible variation. Use a saved template or choose your movements yourself."};
+    if(requiresUserChosenMovements()) return {pool:pool,manual:true,note:"Your profile includes a limb or hand-use consideration, so Rung will not guess an accessible variation. Use a saved template or choose your movements yourself."};
     if(prefersSupportedMovements()){
       var supported=pool.filter(isSupportedExercise);
-      return supported.length?{pool:supported,manual:false,note:" Prioritizing seated or machine-supported options from your list."}:{pool:pool,manual:true,note:"No seated or machine-supported options are in this list, so Progression will not choose movements automatically. Add an option you prefer or use a saved template."};
+      return supported.length?{pool:supported,manual:false,note:" Prioritizing seated or machine-supported options from your list."}:{pool:pool,manual:true,note:"No seated or machine-supported options are in this list, so Rung will not choose movements automatically. Add an option you prefer or use a saved template."};
     }
     return {pool:pool,manual:false,note:""};
   }
@@ -807,7 +806,7 @@
     if(!hasFunctionalNeeds()) return "No functional needs are saved. You can add or remove them any time.";
     var text="Automatic load and cardio increases are off.";
     if(prefersSupportedMovements()) text+=" Suggested strength plans prioritize seated or machine-supported options when they are in your list.";
-    if(requiresUserChosenMovements()) text+=" Progression will not guess an accessible movement variation; use your own template or choose movements yourself.";
+    if(requiresUserChosenMovements()) text+=" Rung will not guess an accessible movement variation; use your own template or choose movements yourself.";
     return text;
   }
   function uid(){ return session&&session.user&&session.user.id; }
@@ -843,10 +842,15 @@
     return Promise.resolve({error:{message:"bad op"}});
   }
   function isTransient(e){ var m=String((e&&e.message)||e||"").toLowerCase(); return !m || /network|fetch|offline|timeout|failed to fetch|socket/.test(m); }
+  function writeErrorMessage(e,d){
+    var message=String((e&&e.message)||e||"Couldn't save that change."), fields=d&&d.values?Object.keys(d.values):[];
+    if(d&&d.table==="exercises"&&(fields.indexOf("seat")>=0||fields.indexOf("seat2")>=0)&&/schema cache|could not find.*(seat|seat2)|column.*(seat|seat2)/i.test(message)) return "Machine settings need a one-time database update. In Supabase, open SQL Editor and re-run schema.sql, then reload Rung.";
+    return message;
+  }
   function queuedDescriptor(d){ return Object.assign({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()), user_id:uid(), created_at:Date.now()},d); }
   async function qWrite(d){
     var desc=queuedDescriptor(d);
-    try{ var r=await runDesc(desc); if(r&&r.error){ if(isTransient(r.error)){ _pending.push(desc); savePending(); toast("Offline - saved on this device and will sync."); return {queued:true}; } toast(r.error.message,true); return {ok:false,error:r.error}; } return {ok:true}; }
+    try{ var r=await runDesc(desc); if(r&&r.error){ if(isTransient(r.error)){ _pending.push(desc); savePending(); toast("Offline - saved on this device and will sync."); return {queued:true}; } toast(writeErrorMessage(r.error,desc),true); return {ok:false,error:r.error}; } return {ok:true}; }
     catch(e){ _pending.push(desc); savePending(); toast("Offline - saved on this device and will sync."); return {queued:true}; }
   }
   async function flushQueue(){
@@ -1078,7 +1082,7 @@
   async function setPrescription(ex, patch){ var r=await qWrite({op:"update",table:"exercises",values:patch,matchCol:"id",matchVal:ex.id}); if(r.error) return; Object.assign(ex,patch); render(); }
   async function persistField(ex, patch){ var r=await qWrite({op:"update",table:"exercises",values:patch,matchCol:"id",matchVal:ex.id}); if(r.error) return; Object.assign(ex,patch); }
   async function delSession(row){
-    if(!confirm("Delete this saved session? If it is the latest session for the exercise, Progression will restore the prior prescription.")) return;
+    if(!confirm("Delete this saved session? If it is the latest session for the exercise, Rung will restore the prior prescription.")) return;
     var r=await qWrite({op:"delete",table:"sessions",matchCol:"id",matchVal:row.id}); if(r.error) return;
     var ex=state.filter(function(x){return x.id===row.exercise_id;})[0];
     if(ex){
@@ -1228,7 +1232,7 @@
     if(!calibration||!calibration.completed_at){ showPanel("Calibration"); return; }
     var template=suggestedTemplate();
     if(template){ await startTemplate(template); return; }
-    if(requiresUserChosenMovements()) { toast("Use a saved template or choose your movements yourself. Progression will not guess an accessible variation.",true); return; }
+    if(requiresUserChosenMovements()) { toast("Use a saved template or choose your movements yourself. Rung will not guess an accessible variation.",true); return; }
     if(!state.length){ toast("Add a strength exercise first.",true); return; }
     $("planMins").value=String(plannerProfile().minutes);
     $("planDay").value="";
@@ -1566,8 +1570,31 @@
     {id:"hinge",name:"Hip hinge",hint:"Romanian deadlift, hip thrust, or back extension"}
   ];
   function currentEstimates(){ return (calibration&&calibration.estimates)||[]; }
-  function estimateById(id){ return currentEstimates().filter(function(x){return x.id===id;})[0]||{id:id,unknown:true,weight:"",reps:"",effort:"solid"}; }
-  function bmiValue(){ var h=parseFloat($("calHeight").value), w=parseFloat($("calWeight").value); if(!h||!w) return null; return unit==="kg"?(w/Math.pow(h*2.54/100,2)):(703*w/(h*h)); }
+  function estimateById(id){ return currentEstimates().filter(function(x){return x.id===id;})[0]||{id:id,unknown:false,weight:"",reps:"",effort:"solid"}; }
+  function measurementSystem(){ return $("calMeasurementSystem").value==="metric"?"metric":"imperial"; }
+  function enteredHeightInches(){
+    if(measurementSystem()==="metric"){ var cm=parseFloat($("calHeightCm").value); return cm?cm/2.54:null; }
+    var feet=parseInt($("calHeightFeet").value,10), inches=parseInt($("calHeightInches").value,10);
+    if(isNaN(feet)&&isNaN(inches)) return null;
+    return (isNaN(feet)?0:feet*12)+(isNaN(inches)?0:inches);
+  }
+  function updateMeasurementFields(){
+    var metric=measurementSystem()==="metric";
+    $("calImperialHeight").hidden=metric; $("calMetricHeight").hidden=!metric;
+    $("calWeightLabel").textContent="Weight ("+(metric?"kg":"lb")+")";
+    showBmi();
+  }
+  function switchMeasurementSystem(){
+    var wasMetric=$("calImperialHeight").hidden, nextMetric=measurementSystem()==="metric", weight=parseFloat($("calWeight").value), height;
+    if(wasMetric){ var oldCm=parseFloat($("calHeightCm").value); height=oldCm?oldCm/2.54:null; }
+    else { var oldFeet=parseInt($("calHeightFeet").value,10), oldInches=parseInt($("calHeightInches").value,10); height=(isNaN(oldFeet)&&isNaN(oldInches))?null:(isNaN(oldFeet)?0:oldFeet*12)+(isNaN(oldInches)?0:oldInches); }
+    if(wasMetric!==nextMetric){
+      if(height){ if(nextMetric) $("calHeightCm").value=Math.round(height*2.54); else { $("calHeightFeet").value=Math.floor(height/12); $("calHeightInches").value=Math.round(height%12); } }
+      if(weight) $("calWeight").value=(nextMetric?(weight/2.2046226218):(weight*2.2046226218)).toFixed(1).replace(/\.0$/,"");
+    }
+    updateMeasurementFields();
+  }
+  function bmiValue(){ var h=enteredHeightInches(), w=parseFloat($("calWeight").value); if(!h||!w) return null; return measurementSystem()==="metric"?(w/Math.pow(h*2.54/100,2)):(703*w/(h*h)); }
   function showBmi(){ var b=bmiValue(); $("calBmi").textContent=b?"BMI: "+b.toFixed(1)+" · screening/trend only":"BMI: optional"; }
   function selectedFunctionalNeeds(prefix){
     var box=$(prefix+"FunctionalChips"), ids=box?Array.prototype.slice.call(box.querySelectorAll('[aria-pressed="true"]')).map(function(button){return button.getAttribute("data-need");}):[];
@@ -1611,7 +1638,12 @@
   function renderCalibration(){
     var c=calibration||{}, profile=c.profile||{};
     $("calExperience").value=c.experience||"new"; $("calMinutes").value=String(c.minutes||30); $("calEquipment").value=c.equipment||"mixed";
-    $("calCaution").value=c.caution||"no"; $("calHeight").value=(c.body&&c.body.height)||""; $("calWeight").value=(c.body&&c.body.weight)||"";
+    $("calCaution").value=c.caution||"no";
+    var body=c.body||{}, system=body.measurement_system||"imperial", heightIn=body.height_inches||((body.height_unit==="cm"||body.measurement_system==="metric")?Number(body.height_cm||body.height)/2.54:Number(body.height)), weight=Number(body.weight)||null, weightUnit=body.weight_unit||body.unit||"lb";
+    $("calMeasurementSystem").value=system;
+    $("calHeightFeet").value=heightIn?Math.floor(heightIn/12):""; $("calHeightInches").value=heightIn?Math.round(heightIn%12):""; $("calHeightCm").value=heightIn?Math.round(heightIn*2.54):"";
+    if(weight&&((system==="metric"&&weightUnit!=="kg")||(system==="imperial"&&weightUnit==="kg"))) weight=system==="metric"?weight/2.2046226218:weight*2.2046226218;
+    $("calWeight").value=weight?Number(weight.toFixed(1)):""; updateMeasurementFields();
     $("calCardioWeekly").value=(c.cardio&&c.cardio.weekly!=null)?c.cardio.weekly:0; $("calCardioLongest").value=(c.cardio&&c.cardio.longest)||""; $("calCardioType").value=(c.cardio&&c.cardio.type)||"walk";
     renderFunctionalNeeds();
     var area=$("calEstimates"); area.innerHTML="";
@@ -1637,7 +1669,7 @@
   function renderCalibrationConsoleNotice(){
     var box=$("calConsoleNotice"); if(!box) return;
     if(progressionGuardActive()){
-      box.style.display="block"; box.textContent=hasFunctionalNeeds()?"Functional needs are on. Progression will not raise loads or cardio targets automatically, and will only adapt suggestions where it can do so safely.":"Caution setting is on. Progression will not raise loads or cardio targets automatically. Follow your clinician-approved plan."; return;
+      box.style.display="block"; box.textContent=hasFunctionalNeeds()?"Functional needs are on. Rung will not raise loads or cardio targets automatically, and will only adapt suggestions where it can do so safely.":"Caution setting is on. Rung will not raise loads or cardio targets automatically. Follow your clinician-approved plan."; return;
     }
     if(calibration&&calibration.completed_at&&calibrationEvidence.confidence<70){
       box.style.display="block"; box.textContent="Still learning from your workouts. Start light and use the effort tags. Your first set is a check, not a test."; return;
@@ -1779,7 +1811,7 @@
     selectGoalValue("goalStrengthDays",profile.strengthDays);
     selectGoalValue("goalCardioMinutes",ctarget,ctarget+" min");
     selectGoalValue("goalMobilitySessions",profile.mobilitySessions);
-    $("goalsStatus").textContent=progressionGuardActive()?(hasFunctionalNeeds()?"Functional needs are on. These are planning goals; Progression will not raise loads or cardio automatically.":"Caution setting is on. These are planning goals; Progression will not raise loads or cardio automatically."):"Pick goals that fit a normal week. You can adjust them anytime.";
+    $("goalsStatus").textContent=progressionGuardActive()?(hasFunctionalNeeds()?"Functional needs are on. These are planning goals; Rung will not raise loads or cardio automatically.":"Caution setting is on. These are planning goals; Rung will not raise loads or cardio automatically."):"Pick goals that fit a normal week. You can adjust them anytime.";
   }
   async function saveGoals(){
     weeklyGoals={movementDays:parseInt($("goalMovementDays").value,10)||0,strengthDays:parseInt($("goalStrengthDays").value,10)||0,cardioMinutes:parseInt($("goalCardioMinutes").value,10)||0,mobilitySessions:parseInt($("goalMobilitySessions").value,10)||0,updated_at:new Date().toISOString()};
@@ -1846,7 +1878,7 @@
   function renderStretchTab(){
     var catalog=stretchCatalog();if(!catalog)return;var selected=catalog.find(selectedStretchId)||catalog.all[0], routine=$("stretchRoutine"), picker=$("stretchPicker"), suggested=selectedSuggestedRoutine();selectedStretchId=selected.id;renderStretchWeek();$("stretchTransition").value=String(stretchTransitionSeconds);$("stretchRoutineTitle").textContent=suggested.name;$("stretchRoutineNote").textContent=stretchRoutineDescription(suggested.key);$("stretchRoutineTime").textContent="~"+stretchMinutes(suggested.ids)+" min";routine.innerHTML="";
     suggested.ids.forEach(function(id){var move=catalog.find(id);if(!move)return;var button=el("button","stretchchoice"+(id===selected.id?" active":""));button.type="button";button.innerHTML='<span class="stretchdot">'+(id===selected.id?"●":"○")+'</span><span><b>'+move.name+'</b><small>'+move.hold+(move.bilateral?" each side":"")+' · '+stretchAreas(move)+'</small></span><span class="chev">›</span>';button.addEventListener("click",function(){selectStretch(id);});routine.appendChild(button);});
-    picker.innerHTML="";catalog.all.forEach(function(move){var option=el("option",null,move.name+" · "+stretchAreas(move));option.value=move.id;if(move.id===selected.id)option.selected=true;picker.appendChild(option);});$("stretchDetailName").textContent=selected.name;$("stretchDetailMeta").textContent=stretchAreas(selected);var art=stretchArt(selected.id),frames=$("stretchFrames"),illustrated=el("div","stretchframe"),caption=el("div","stretchframecaption","Original two-position clinical illustration");frames.innerHTML="";frames.classList.add("illustrated");illustrated.innerHTML='<img src="'+art+'" alt="Two-position illustration showing '+selected.name+'">';illustrated.appendChild(caption);frames.appendChild(illustrated);$("stretchHow").textContent=selected.how;$("stretchWhy").textContent=selected.why;renderCustomStretchRoutines();if($("customStretchBuilder").style.display!=="none")renderCustomStretchBuilder();renderStretchTimer();
+    picker.innerHTML="";catalog.all.forEach(function(move){var option=el("option",null,move.name+" · "+stretchAreas(move));option.value=move.id;if(move.id===selected.id)option.selected=true;picker.appendChild(option);});$("stretchDetailName").textContent=selected.name;$("stretchDetailMeta").textContent=stretchAreas(selected);var art=stretchArt(selected.id),frames=$("stretchFrames"),illustrated=el("div","stretchframe"),caption=el("div","stretchframecaption","Original two-position clinical illustration"),image=el("img");frames.innerHTML="";frames.classList.add("illustrated");image.src=art;image.alt="Two-position illustration showing "+selected.name;image.addEventListener("error",function(){if(image.parentNode)image.remove();caption.textContent="Illustration unavailable";var note=el("div","stretchmissing","This illustration did not load. Re-deploy Rung with the assets/stretches folder included, then reload.");illustrated.insertBefore(note,caption);});illustrated.appendChild(image);illustrated.appendChild(caption);frames.appendChild(illustrated);$("stretchHow").textContent=selected.how;$("stretchWhy").textContent=selected.why;renderCustomStretchRoutines();if($("customStretchBuilder").style.display!=="none")renderCustomStretchBuilder();renderStretchTimer();
   }
   function completeStretchSession(){var suggested=selectedSuggestedRoutine();startStretchRoutine(suggested.ids,suggested.name);}
   async function renderToday(){
@@ -1874,7 +1906,8 @@
   async function saveCalibration(){
     var caution=$("calCaution").value, estimates=collectEstimates(), needs=selectedFunctionalNeeds("cal"), weekly=Math.max(0,parseInt($("calCardioWeekly").value,10)||0), guarded=caution!=="no"||needs.limitations.length>0, cardio=window.ProgressionCalibration.deriveCardioTarget(weekly,guarded);
     functionalNeeds=needs;
-    calibration={version:2,completed_at:new Date().toISOString(),experience:$("calExperience").value,minutes:parseInt($("calMinutes").value,10)||30,equipment:$("calEquipment").value,caution:caution,functional:needs,estimates:estimates,body:{height:parseFloat($("calHeight").value)||null,weight:parseFloat($("calWeight").value)||null,unit:unit,bmi:bmiValue()},cardio:{weekly:weekly,longest:parseInt($("calCardioLongest").value,10)||null,type:$("calCardioType").value,target:cardio.minutes},profile:{strengthDays:window.ProgressionCalibration.starterStrengthDays($("calExperience").value,guarded),mobilitySessions:2}};
+    var bodySystem=measurementSystem(), heightIn=enteredHeightInches(), bodyWeight=parseFloat($("calWeight").value)||null;
+    calibration={version:3,completed_at:new Date().toISOString(),experience:$("calExperience").value,minutes:parseInt($("calMinutes").value,10)||30,equipment:$("calEquipment").value,caution:caution,functional:needs,estimates:estimates,body:{height:heightIn||null,height_inches:heightIn||null,height_cm:heightIn?Number((heightIn*2.54).toFixed(1)):null,height_unit:bodySystem==="metric"?"cm":"in",weight:bodyWeight,weight_unit:bodySystem==="metric"?"kg":"lb",measurement_system:bodySystem,unit:bodySystem==="metric"?"kg":"lb",bmi:bmiValue()},cardio:{weekly:weekly,longest:parseInt($("calCardioLongest").value,10)||null,type:$("calCardioType").value,target:cardio.minutes},profile:{strengthDays:window.ProgressionCalibration.starterStrengthDays($("calExperience").value,guarded),mobilitySessions:2}};
     if(!weeklyGoals){weeklyGoals={movementDays:Math.max(2,calibration.profile.strengthDays||2),strengthDays:calibration.profile.strengthDays,cardioMinutes:cardio.minutes,mobilitySessions:2,updated_at:new Date().toISOString()};}
     var r=await sb.auth.updateUser({data:{calibration:calibration,functionalNeeds:functionalNeeds,weeklyGoals:weeklyGoals,calibrationSkippedAt:null}}); if(r.error){toast(r.error.message,true);return;}
     await refreshCalibrationEvidence(); renderCalibrationStatus(); toast("Starting point saved. Your first sessions will refine it."); showPanel("Today");
@@ -1904,7 +1937,7 @@
   }
   async function restoreData(file){
     if(!file) return; var raw=await file.text(), backup; try{backup=JSON.parse(raw);}catch(e){toast("That file is not valid JSON.",true);return;}
-    if(!backup||backup.format!=="progression-backup"||!Array.isArray(backup.exercises)){toast("That is not a Progression backup.",true);return;}
+    if(!backup||backup.format!=="progression-backup"||!Array.isArray(backup.exercises)){toast("That is not a Rung backup.",true);return;}
     if(!confirm("Restore this backup into the current account? It merges data and cannot be undone.")) return;
     try{
       var machineMap={}, workoutMap={}, exerciseMap={};
@@ -1966,8 +1999,7 @@
     if(name==="Calibration") renderCalibration();
     if(name==="Settings"){ renderEquipmentControls(); renderFunctionalNeeds(); $("stretchTransitionSetting").value=String(stretchTransitionSeconds); }
   }
-  $("burger").addEventListener("click",function(e){ e.stopPropagation(); $("drawer").classList.toggle("open"); });
-  document.addEventListener("click",function(e){ if(!$("drawer").contains(e.target) && e.target!==$("burger") && !$("burger").contains(e.target)) $("drawer").classList.remove("open"); });
+  document.addEventListener("click",function(e){ if(!$("drawer").contains(e.target) && e.target!==$("openMore") && !$("openMore").contains(e.target)) $("drawer").classList.remove("open"); });
   Array.prototype.forEach.call($("drawer").children,function(b){ b.addEventListener("click",function(){ showPanel(b.getAttribute("data-panel")); }); });
   Array.prototype.forEach.call(document.querySelectorAll(".appdock button[data-panel]"),function(b){ b.addEventListener("click",function(){ showPanel(b.getAttribute("data-panel")); }); });
   $("openMore").addEventListener("click",function(e){ e.stopPropagation(); $("drawer").classList.toggle("open"); });
@@ -2057,7 +2089,7 @@
   $("openCalibration").addEventListener("click",function(){ showPanel("Calibration"); });
   $("saveCalibration").addEventListener("click",saveCalibration);
   $("skipCalibration").addEventListener("click",skipCalibration);
-  $("calHeight").addEventListener("input",showBmi); $("calWeight").addEventListener("input",showBmi);
+  $("calMeasurementSystem").addEventListener("change",switchMeasurementSystem); $("calHeightFeet").addEventListener("input",showBmi); $("calHeightInches").addEventListener("input",showBmi); $("calHeightCm").addEventListener("input",showBmi); $("calWeight").addEventListener("input",showBmi);
   $("calCaution").addEventListener("change",updateCardioPreview); $("calCardioWeekly").addEventListener("input",updateCardioPreview);
   $("exportData").addEventListener("click",exportData);
   $("importData").addEventListener("change",function(){ restoreData(this.files&&this.files[0]); this.value=""; });

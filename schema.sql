@@ -1,4 +1,4 @@
--- Progression schema v4. Safe to re-run in the Supabase SQL editor.
+-- Rung schema v5. Safe to re-run in the Supabase SQL editor.
 -- It includes workout grouping, rest, analytics, and custom-exercise muscle fields.
 create extension if not exists pgcrypto;
 
@@ -94,6 +94,10 @@ create table if not exists public.cardio_sessions (
 -- Migrate installations created by earlier versions.
 alter table public.exercises add column if not exists rest_seconds integer check (rest_seconds between 15 and 900);
 alter table public.exercises add column if not exists warmup_sets integer not null default 0 check (warmup_sets between 0 and 5);
+-- These were part of the original create-table definition, but need explicit
+-- migrations for databases that were created before adjustable machine settings.
+alter table public.exercises add column if not exists seat integer check (seat between 1 and 10);
+alter table public.exercises add column if not exists seat2 integer check (seat2 between 1 and 10);
 alter table public.exercises add column if not exists muscles jsonb not null default '[]'::jsonb;
 alter table public.exercises add column if not exists body_area text check (body_area in ('upper','lower','core'));
 alter table public.sessions add column if not exists workout_id uuid references public.workouts(id) on delete set null;
