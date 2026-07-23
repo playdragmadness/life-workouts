@@ -5,7 +5,7 @@
 
 // Bump this release identifier for each deployment. It keeps an installed app from
 // mixing an old page with new scripts/assets.
-const CACHE = "progression-v29";
+const CACHE = "progression-v30";
 const SHELL = [
   "./",
   "./index.html",
@@ -20,14 +20,14 @@ const SHELL = [
   "./exercise-library.js",
   "./stretch-library.js",
   "./stretch-catalog.js",
-  "./assets/stretches/doorway-chest-v1.png",
-  "./assets/stretches/half-kneeling-hip-v1.png",
-  "./assets/stretches/childs-pose-reach-v1.png",
-  "./assets/stretches/cat-cow-v1.png",
-  "./assets/stretches/wall-angels-v1.png",
-  "./assets/stretches/seated-hamstring-v1.png",
-  "./assets/stretches/wall-calf-v1.png",
-  "./assets/stretches/figure-four-v1.png",
+  "./assets/stretches/doorway-chest-v3.png",
+  "./assets/stretches/half-kneeling-hip-v3.png",
+  "./assets/stretches/childs-pose-reach-v3.png",
+  "./assets/stretches/cat-cow-v3.png",
+  "./assets/stretches/wall-angels-v3.png",
+  "./assets/stretches/seated-hamstring-v3.png",
+  "./assets/stretches/wall-calf-v3.png",
+  "./assets/stretches/figure-four-v3.png",
   "./assets/education-bone-comparison.png",
   "./assets/education-muscle-comparison.png",
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
